@@ -4,6 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rei da Água — Distribuição de Galões em Curitiba</title>
+
+  <!-- SEO: Meta Description -->
+  <meta name="description" content="Rei da Água: entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba e região metropolitana. Peça agora pelo WhatsApp!" />
+  <meta name="keywords" content="galão de água, entrega de água, água mineral, Curitiba, distribuição de água, galão 20 litros, galão 10 litros" />
+  <meta name="author" content="Rei da Água" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- SEO: Open Graph (WhatsApp, Instagram, Facebook) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nickelali.github.io/reidaagua/" />
+  <meta property="og:title" content="Rei da Água — Galões de Água em Curitiba" />
+  <meta property="og:description" content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba. Pontualidade e qualidade garantidas. Peça agora!" />
+  <meta property="og:image" content="https://nickelali.github.io/reidaagua/og-image.jpg" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:site_name" content="Rei da Água" />
+
+  <!-- SEO: Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Rei da Água — Galões de Água em Curitiba" />
+  <meta name="twitter:description" content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba." />
+
+  <!-- PWA: Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#005fa3" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Rei da Água" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,18 +73,33 @@
 
   <!-- ===== HERO ===== -->
   <section class="hero" id="inicio">
-    <div class="hero-overlay"></div>
-    <div class="container hero-content">
-      <div class="hero-badge">Entrega em Curitiba</div>
-      <h1 class="hero-title">Água pura na sua<br /><span class="highlight">porta todo dia</span></h1>
-      <p class="hero-subtitle">Galões de 20L e 10L entregues diretamente para distribuidoras, mercados e residências em Curitiba com pontualidade e qualidade.</p>
-      <div class="hero-buttons">
-        <a href="#pedido" class="btn btn-primary">
-          <i class="fa-solid fa-cart-shopping"></i> Fazer Pedido
-        </a>
-        <a href="https://wa.me/5541985231501" target="_blank" class="btn btn-whatsapp">
-          <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
-        </a>
+    <div class="hero-bg-text">H2O</div>
+    <div class="container hero-layout">
+      <div class="hero-text-content reveal">
+        <div class="hero-badge">Entrega Premium em Curitiba</div>
+        <h1 class="hero-title">Água pura na sua<br /><span class="highlight">porta todo dia</span></h1>
+        <p class="hero-subtitle">Galões de 20L e 10L entregues diretamente para distribuidoras, mercados e residências em Curitiba com pontualidade e qualidade real.</p>
+        <div class="hero-buttons">
+          <a href="#pedido" class="btn btn-primary">
+            <i class="fa-solid fa-cart-shopping"></i> Fazer Pedido
+          </a>
+          <a href="https://wa.me/5541985231501" target="_blank" class="btn btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="hero-image-area reveal">
+        <div class="hero-image-wrapper">
+          <img src="assets/water_jugs.png" alt="Galões de Água Premium" class="hero-main-img" />
+          <div class="hero-floating-card card-1">
+            <i class="fa-solid fa-droplet"></i>
+            <span>100% Pura</span>
+          </div>
+          <div class="hero-floating-card card-2">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>Hoje em Curitiba</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="hero-wave">
@@ -62,27 +110,30 @@
   </section>
 
   <!-- ===== DIFERENCIAIS ===== -->
-  <section class="diferenciais" id="diferenciais">
-    <div class="container diferenciais-grid">
-      <div class="diferencial-card">
-        <div class="diferencial-icon"><i class="fa-solid fa-truck-fast"></i></div>
-        <h3>Entrega Rápida</h3>
-        <p>Pontualidade nas entregas para que você nunca fique sem água.</p>
-      </div>
-      <div class="diferencial-card">
-        <div class="diferencial-icon"><i class="fa-solid fa-shield-halved"></i></div>
-        <h3>Água de Qualidade</h3>
-        <p>Galões certificados e higienizados para garantir a sua saúde.</p>
-      </div>
-      <div class="diferencial-card">
-        <div class="diferencial-icon"><i class="fa-solid fa-handshake"></i></div>
-        <h3>Atendimento Pessoal</h3>
-        <p>Atendimento direto com o proprietário, sem intermediários.</p>
-      </div>
-      <div class="diferencial-card">
-        <div class="diferencial-icon"><i class="fa-solid fa-map-location-dot"></i></div>
-        <h3>Rotas em Curitiba</h3>
-        <p>Cobrimos diversas regiões de Curitiba com rotas organizadas por dia.</p>
+  <section class="diferenciais" id="diferenciais" aria-labelledby="diferenciais-title">
+    <div class="container">
+      <h2 id="diferenciais-title" class="sr-only">Nossos Diferenciais</h2>
+      <div class="diferenciais-grid">
+        <div class="diferencial-card reveal">
+          <div class="diferencial-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></div>
+          <h3>Entrega Rápida</h3>
+          <p>Pontualidade nas entregas para que você nunca fique sem água.</p>
+        </div>
+        <div class="diferencial-card reveal">
+          <div class="diferencial-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
+          <h3>Água de Qualidade</h3>
+          <p>Galões certificados e higienizados para garantir a sua saúde.</p>
+        </div>
+        <div class="diferencial-card reveal">
+          <div class="diferencial-icon"><i class="fa-solid fa-handshake" aria-hidden="true"></i></div>
+          <h3>Atendimento Pessoal</h3>
+          <p>Atendimento direto com o proprietário, sem intermediários.</p>
+        </div>
+        <div class="diferencial-card reveal">
+          <div class="diferencial-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></div>
+          <h3>Rotas em Curitiba</h3>
+          <p>Cobrimos diversas regiões de Curitiba com rotas organizadas por dia.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -90,13 +141,13 @@
   <!-- ===== PRODUTOS ===== -->
   <section class="produtos" id="produtos">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-title">Nossos <span class="highlight">Produtos</span></h2>
         <p class="section-subtitle">Galões de água mineral de alta qualidade para o seu negócio ou residência.</p>
       </div>
       <div class="produtos-grid">
 
-        <div class="produto-card destaque">
+        <div class="produto-card destaque reveal">
           <div class="produto-badge">Mais Vendido</div>
           <div class="produto-icon">
             <i class="fa-solid fa-bottle-water"></i>
@@ -110,7 +161,7 @@
           <a href="#pedido" class="btn btn-primary btn-full">Pedir Agora</a>
         </div>
 
-        <div class="produto-card">
+        <div class="produto-card reveal">
           <div class="produto-icon">
             <i class="fa-solid fa-bottle-water" style="font-size:2.8rem;"></i>
           </div>
@@ -126,18 +177,18 @@
       </div>
 
       <!-- Painel de edição de preços -->
-      <div class="preco-editor" id="preco-editor">
-        <h4><i class="fa-solid fa-pen-to-square"></i> Atualizar Preços</h4>
+      <div class="preco-editor" id="preco-editor" role="region" aria-labelledby="preco-editor-title">
+        <h3 id="preco-editor-title"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Atualizar Preços</h3>
         <div class="preco-inputs">
           <div class="preco-input-group">
             <label for="input-20l">Galão 20L (R$)</label>
-            <input type="number" id="input-20l" placeholder="Ex: 12.00" step="0.01" min="0" />
+            <input type="number" id="input-20l" placeholder="Ex: 12.00" step="0.01" min="0" aria-label="Preço do galão de 20 litros em reais" />
           </div>
           <div class="preco-input-group">
             <label for="input-10l">Galão 10L (R$)</label>
-            <input type="number" id="input-10l" placeholder="Ex: 8.00" step="0.01" min="0" />
+            <input type="number" id="input-10l" placeholder="Ex: 8.00" step="0.01" min="0" aria-label="Preço do galão de 10 litros em reais" />
           </div>
-          <button class="btn btn-primary" id="btn-salvar-precos">Salvar Preços</button>
+          <button class="btn btn-primary" id="btn-salvar-precos" aria-label="Salvar preços dos galões">Salvar Preços</button>
         </div>
         <p class="preco-hint">Os preços são salvos no navegador e ficam visíveis para os clientes.</p>
       </div>
@@ -147,21 +198,21 @@
   <!-- ===== ROTAS ===== -->
   <section class="rotas" id="rotas">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-title">Rotas do <span class="highlight">Dia</span></h2>
         <p class="section-subtitle">Confira os dias de entrega na sua região. Curitiba e região metropolitana.</p>
       </div>
 
-      <div class="rotas-semana" id="rotas-semana">
+      <div class="rotas-semana reveal" id="rotas-semana">
         <!-- Gerado pelo JavaScript -->
       </div>
 
-      <div class="rotas-editor" id="rotas-editor">
-        <h4><i class="fa-solid fa-pen-to-square"></i> Gerenciar Rotas</h4>
+      <div class="rotas-editor" id="rotas-editor" role="region" aria-labelledby="rotas-editor-title">
+        <h3 id="rotas-editor-title"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Gerenciar Rotas</h3>
         <div class="rotas-editor-grid" id="rotas-editor-grid">
           <!-- Gerado pelo JavaScript -->
         </div>
-        <button class="btn btn-primary" id="btn-salvar-rotas">Salvar Rotas</button>
+        <button class="btn btn-primary" id="btn-salvar-rotas" aria-label="Salvar alterações nas rotas de entrega">Salvar Rotas</button>
         <p class="preco-hint">As rotas são salvas no navegador e ficam visíveis para os clientes.</p>
       </div>
     </div>
@@ -170,32 +221,22 @@
   <!-- ===== FROTA / CAMINHÕES ===== -->
   <section class="caminhoes" id="caminhoes">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-title">Nossa <span class="highlight">Frota</span></h2>
         <p class="section-subtitle">Dois caminhões dedicados exclusivamente à entrega de água mineral em Curitiba.</p>
       </div>
       <div class="caminhoes-grid">
 
-        <div class="caminhao-card">
-          <!-- Substitua pelo src da foto real do caminhão 1 -->
-          <div class="caminhao-foto placeholder-foto">
-            <i class="fa-solid fa-truck"></i>
-            <span>Foto do Caminhão 1</span>
-            <small>Substitua pela foto real</small>
-          </div>
+        <div class="caminhao-card reveal">
+          <img src="assets/truck1.png" alt="Caminhão de Entrega 1" class="caminhao-foto" />
           <div class="caminhao-info">
             <h3>Caminhão 1</h3>
             <p>Responsável pelas rotas do setor norte e leste de Curitiba.</p>
           </div>
         </div>
 
-        <div class="caminhao-card">
-          <!-- Substitua pelo src da foto real do caminhão 2 -->
-          <div class="caminhao-foto placeholder-foto">
-            <i class="fa-solid fa-truck"></i>
-            <span>Foto do Caminhão 2</span>
-            <small>Substitua pela foto real</small>
-          </div>
+        <div class="caminhao-card reveal">
+          <img src="assets/truck2.png" alt="Caminhão de Entrega 2" class="caminhao-foto" />
           <div class="caminhao-info">
             <h3>Caminhão 2</h3>
             <p>Responsável pelas rotas do setor sul e oeste de Curitiba.</p>
@@ -209,12 +250,12 @@
   <!-- ===== FAZER PEDIDO ===== -->
   <section class="pedido" id="pedido">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-title">Fazer <span class="highlight">Pedido</span></h2>
         <p class="section-subtitle">Preencha o formulário abaixo e seu pedido será enviado diretamente pelo WhatsApp.</p>
       </div>
 
-      <div class="pedido-wrapper">
+      <div class="pedido-wrapper reveal">
         <form class="pedido-form" id="pedido-form" novalidate>
 
           <div class="form-group">
@@ -252,11 +293,11 @@
             <textarea id="obs" rows="3" placeholder="Alguma informação adicional para a entrega..."></textarea>
           </div>
 
-          <div class="pedido-resumo" id="pedido-resumo">
-            <h4>Resumo do Pedido</h4>
-            <div class="resumo-linha"><span>Galões 20L:</span><span id="res-20l">0 un.</span></div>
-            <div class="resumo-linha"><span>Galões 10L:</span><span id="res-10l">0 un.</span></div>
-            <div class="resumo-linha resumo-total"><span>Total estimado:</span><span id="res-total">R$ 0,00</span></div>
+          <div class="pedido-resumo" id="pedido-resumo" role="region" aria-labelledby="resumo-title">
+            <h3 id="resumo-title">Resumo do Pedido</h3>
+            <div class="resumo-linha"><span>Galões 20L:</span><span id="res-20l" aria-live="polite">0 un.</span></div>
+            <div class="resumo-linha"><span>Galões 10L:</span><span id="res-10l" aria-live="polite">0 un.</span></div>
+            <div class="resumo-linha resumo-total"><span>Total estimado:</span><span id="res-total" aria-live="polite">R$ 0,00</span></div>
           </div>
 
           <button type="submit" class="btn btn-whatsapp btn-full btn-lg">
@@ -342,19 +383,20 @@
   </a>
 
   <!-- Botão de Login Administrativo (Discreto no rodapé) -->
-  <button class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário">
-    <i class="fa-solid fa-lock"></i>
+  <button class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário" aria-label="Acessar área administrativa do proprietário">
+    <i class="fa-solid fa-lock" aria-hidden="true"></i>
   </button>
 
   <!-- Modal de Senha -->
-  <div class="modal-overlay" id="modal-senha">
+  <div class="modal-overlay" id="modal-senha" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-content">
-      <h3>Acesso Administrativo</h3>
+      <h2 id="modal-title">Acesso Administrativo</h2>
       <p>Digite a senha para editar preços e rotas:</p>
-      <input type="password" id="input-senha" placeholder="Senha..." />
+      <label for="input-senha" class="sr-only">Senha de acesso administrativo</label>
+      <input type="password" id="input-senha" placeholder="Senha..." autocomplete="current-password" />
       <div class="modal-buttons">
-        <button class="btn btn-outline" id="btn-cancelar-senha">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirmar-senha">Entrar</button>
+        <button class="btn btn-outline" id="btn-cancelar-senha" aria-label="Cancelar acesso administrativo">Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirmar-senha" aria-label="Confirmar senha e entrar na área administrativa">Entrar</button>
       </div>
     </div>
   </div>

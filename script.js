@@ -330,26 +330,41 @@ function initScrollSuave() {
 
 // ===== ANIMAÇÃO DE ENTRADA (Intersection Observer) =====
 function initAnimacoes() {
-  const elementos = document.querySelectorAll(
-    '.diferencial-card, .produto-card, .caminhao-card, .contato-card, .rota-dia, .info-card'
-  );
+  const elementos = document.querySelectorAll('.reveal');
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.style.opacity    = '1';
-        entry.target.style.transform  = 'translateY(0)';
-        observer.unobserve(entry.target);
+        entry.target.classList.add('active');
+        // observer.unobserve(entry.target); // Deletar se quiser que re-anime ao sair/entrar
       }
     });
-  }, { threshold: 0.12 });
-
-  elementos.forEach(el => {
-    el.style.opacity   = '0';
-    el.style.transform = 'translateY(28px)';
-    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-    observer.observe(el);
+  }, { 
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px' 
   });
+
+  elementos.forEach(el => observer.observe(el));
+
+  // Efeito de movimento sutil no Hero com o mouse
+  const hero = document.querySelector('.hero');
+  const wrapper = document.querySelector('.hero-image-wrapper');
+  
+  if (hero && wrapper && window.innerWidth > 992) {
+    hero.addEventListener('mousemove', (e) => {
+      const { clientX, clientY } = e;
+      const { innerWidth, innerHeight } = window;
+      
+      const moveX = (clientX - innerWidth / 2) / 25;
+      const moveY = (clientY - innerHeight / 2) / 25;
+      
+      wrapper.style.transform = `rotateY(${-10 + moveX}deg) rotateX(${5 - moveY}deg)`;
+    });
+
+    hero.addEventListener('mouseleave', () => {
+      wrapper.style.transform = `rotateY(-10deg) rotateX(5deg)`;
+    });
+  }
 }
 
 // ===== INICIALIZAÇÃO =====

@@ -1,0 +1,36 @@
+{
+  "name": "Rei da Água — Galões em Curitiba",
+  "short_name": "Rei da Água",
+  "description": "Entrega de galões de 20L e 10L em Curitiba. Peça agora pelo WhatsApp!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f8ff",
+  "theme_color": "#005fa3",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "food"],
+  "shortcuts": [
+    {
+      "name": "Fazer Pedido",
+      "short_name": "Pedido",
+      "description": "Fazer um novo pedido de galões",
+      "url": "/#pedido",
+      "icons": [{ "src": "favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "WhatsApp",
+      "short_name": "WhatsApp",
+      "description": "Falar pelo WhatsApp",
+      "url": "https://wa.me/5541985231501",
+      "icons": [{ "src": "favicon.svg", "sizes": "any" }]
+    }
+  ]
+}
