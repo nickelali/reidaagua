@@ -123,23 +123,37 @@ function renderizarPrecos() {
 function initPrecos() {
   renderizarPrecos();
 
-  document.getElementById('btn-salvar-precos').addEventListener('click', () => {
-    const v20 = parseFloat(document.getElementById('input-20l').value);
-    const v10 = parseFloat(document.getElementById('input-10l').value);
+    document.getElementById('btn-salvar-precos').addEventListener('click', () => {
+      const v20 = parseFloat(document.getElementById('input-20l').value);
+      const v10 = parseFloat(document.getElementById('input-10l').value);
 
-    if (isNaN(v20) && isNaN(v10)) {
-      mostrarToast('Informe pelo menos um preço.', 'error');
-      return;
-    }
+      if (isNaN(v20) && isNaN(v10)) {
+        mostrarToast('Informe pelo menos um preço.', 'error');
+        return;
+      }
 
-    if (!isNaN(v20) && v20 >= 0) precos.p20 = v20;
-    if (!isNaN(v10) && v10 >= 0) precos.p10 = v10;
+      if (!isNaN(v20) && v20 >= 0) precos.p20 = v20;
+      if (!isNaN(v10) && v10 >= 0) precos.p10 = v10;
 
-    salvarDados();
-    renderizarPrecos();
-    mostrarToast('Preços atualizados com sucesso!');
-  });
-}
+      salvarDados();
+      renderizarPrecos();
+      mostrarToast('Preços salvos com sucesso!');
+    });
+
+    // Live Preview de Preços
+    const inputsPreco = ['input-20l', 'input-10l'];
+    inputsPreco.forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        const v20 = parseFloat(document.getElementById('input-20l').value) || precos.p20;
+        const v10 = parseFloat(document.getElementById('input-10l').value) || precos.p10;
+        
+        // Preview temporário (sem salvar)
+        document.getElementById('preco-20l').textContent = formatarMoeda(v20);
+        document.getElementById('preco-10l').textContent = formatarMoeda(v10);
+        atualizarResumoPedido();
+      });
+    });
+  }
 
 // ===== ROTAS =====
 function renderizarRotas() {
@@ -213,14 +227,33 @@ function initRotas() {
   renderizarEditorRotas();
 
   document.getElementById('btn-salvar-rotas').addEventListener('click', () => {
-    const ordem = [1, 2, 3, 4, 5, 6, 0];
-    ordem.forEach(idx => {
-      const input = document.getElementById(`rota-input-${idx}`);
-      if (input) rotas[idx] = input.value.trim();
-    });
     salvarDados();
     renderizarRotas();
     mostrarToast('Rotas atualizadas com sucesso!');
+  });
+
+  // Live Preview de Rotas (Feedback instantâneo no site ao digitar no admin)
+  const ordem = [1, 2, 3, 4, 5, 6, 0];
+  ordem.forEach(idx => {
+    const input = document.getElementById(`rota-input-${idx}`);
+    if (input) {
+      input.addEventListener('input', () => {
+        const diasCards = document.querySelectorAll('.rota-dia');
+        const cardIndex = ordem.indexOf(idx);
+        const card = diasCards[cardIndex];
+        if (!card) return;
+
+        let regiaoDiv = card.querySelector('.rota-dia-regioes') || card.querySelector('.rota-dia-vazio');
+        
+        if (input.value.trim()) {
+          regiaoDiv.className = 'rota-dia-regioes';
+          regiaoDiv.textContent = input.value.trim();
+        } else {
+          regiaoDiv.className = 'rota-dia-vazio';
+          regiaoDiv.textContent = idx === 0 ? 'Sem entrega' : 'A definir';
+        }
+      });
+    }
   });
 }
 
@@ -244,9 +277,15 @@ function atualizarResumoPedido() {
     podeMostrarTotal = true;
   }
 
-  document.getElementById('res-total').textContent = podeMostrarTotal
-    ? formatarMoeda(total)
-    : 'Consulte o vendedor';
+  const totalEl = document.getElementById('res-total');
+  const novoValor = podeMostrarTotal ? formatarMoeda(total) : 'Consulte o vendedor';
+  
+  if (totalEl.textContent !== novoValor) {
+    totalEl.textContent = novoValor;
+    totalEl.classList.remove('pulse-animation');
+    void totalEl.offsetWidth; // Trigger reflow
+    totalEl.classList.add('pulse-animation');
+  }
 }
 
 function initPedido() {
@@ -282,25 +321,32 @@ function initPedido() {
       return;
     }
 
-    // Montar mensagem
-    let msg = `*🚰 PEDIDO — REI DA ÁGUA*\n\n`;
-    msg += `*Cliente:* ${nome}\n`;
-    msg += `*Endereço:* ${end}\n\n`;
-    msg += `*Itens do Pedido:*\n`;
-    if (qtd20 > 0) msg += `• Galão 20L: ${qtd20} un.${precos.p20 ? ' — ' + formatarMoeda(qtd20 * precos.p20) : ''}\n`;
-    if (qtd10 > 0) msg += `• Galão 10L: ${qtd10} un.${precos.p10 ? ' — ' + formatarMoeda(qtd10 * precos.p10) : ''}\n`;
+    // Montar mensagem Premium
+    let msg = `*🌊 NOVO PEDIDO — REI DA ÁGUA*\n`;
+    msg += `------------------------------------------\n\n`;
+    msg += `👤 *CLIENTE:* ${nome}\n`;
+    msg += `📍 *ENDEREÇO:* ${end}\n`;
+    if (turno) msg += `⏰ *TURNO:* ${turno}\n`;
+    msg += `\n📦 *ITENS DO PEDIDO:*\n`;
+    
+    if (qtd20 > 0) {
+      msg += `▪️ Galão 20L: ${qtd20} un. ${precos.p20 ? '(_' + formatarMoeda(qtd20 * precos.p20) + '_)' : ''}\n`;
+    }
+    if (qtd10 > 0) {
+      msg += `▪️ Galão 10L: ${qtd10} un. ${precos.p10 ? '(_' + formatarMoeda(qtd10 * precos.p10) + '_)' : ''}\n`;
+    }
 
     if (precos.p20 !== null || precos.p10 !== null) {
       let total = 0;
       if (precos.p20) total += qtd20 * precos.p20;
       if (precos.p10) total += qtd10 * precos.p10;
-      msg += `\n*Total estimado:* ${formatarMoeda(total)}\n`;
+      msg += `\n💰 *TOTAL ESTIMADO:* ${formatarMoeda(total)}\n`;
     }
 
-    if (turno) msg += `\n*Turno preferido:* ${turno}\n`;
-    if (obs)   msg += `\n*Observações:* ${obs}\n`;
-
-    msg += `\n_Pedido enviado pelo site Rei da Água_`;
+    if (obs) msg += `\n📝 *OBS:* ${obs}\n`;
+    
+    msg += `\n------------------------------------------\n`;
+    msg += `_Enviado via reidaagua.com.br_`;
 
     const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');

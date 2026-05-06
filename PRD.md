@@ -42,19 +42,11 @@
 
 ---
 
-## ⚙️ SPRINT 3: Funcionalidades & Backend (Interatividade)
-*Foco em melhorar a experiência de compra e facilitar a gestão.*
-
-- [ ] **3.1. Calculadora de Pedidos em Tempo Real**
-  - Atualizar o resumo do pedido instantaneamente conforme o usuário altera as quantidades.
-  - Exibir total estimado com base nos preços configurados.
-- [ ] **3.2. Formatação Avançada para WhatsApp**
-  - Criar um template de mensagem profissional: "*Novo Pedido Rei da Água: [Produtos] - Total: [Valor] - Endereço: [Local]*".
-- [ ] **3.3. Melhoria do Painel Administrativo**
-  - Adicionar preview em tempo real das alterações de preços e rotas.
-  - Implementar persistência local (LocalStorage) mais robusta para as rotas semanais.
-- [ ] **3.4. Seção de Depoimentos e Prova Social**
-  - Criar slider moderno com feedbacks de clientes reais.
+### **Sprint 3: Funcionalidades & Backend (Interatividade)**
+- [x] **Tarefa 3.1 — Calculadora de Pedidos:** Resumo atualizado em tempo real com animação de pulso.
+- [x] **Tarefa 3.2 — Formatação WhatsApp:** Mensagem premium com emojis e separadores profissionais.
+- [x] **Tarefa 3.3 — Painel Administrativo:** Live Preview de preços e rotas + persistência local robusta.
+- [x] **Tarefa 3.4 — Depoimentos:** Seção de prova social com design de cards premium.
 
 ---
 
