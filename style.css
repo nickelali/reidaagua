@@ -10,7 +10,7 @@
 }
 
 :root {
-  --azul-escuro:  #0a3d62;
+  --azul-escuro:  #052c4a; /* Um pouco mais escuro para melhor contraste */
   --azul-medio:   #1a6fa8;
   --azul-claro:   #2196f3;
   --azul-agua:    #4fc3f7;
@@ -18,7 +18,7 @@
   --branco:       #ffffff;
   --cinza-claro:  #f0f8ff;
   --cinza-medio:  #e0eaf3;
-  --cinza-texto:  #555e6d;
+  --cinza-texto:  var(--azul-escuro); /* Unificando todas as escritas no azul escuro */
   --verde-wpp:    #25d366;
   --sombra:       0 4px 24px rgba(10,61,98,0.12);
   --sombra-hover: 0 8px 32px rgba(10,61,98,0.22);
@@ -27,6 +27,7 @@
   --transicao:    0.3s ease;
   --fonte-titulo: 'Montserrat', sans-serif;
   --fonte-corpo:  'Open Sans', sans-serif;
+  --azul-bebe-soft: rgba(185, 233, 255, 0.4); /* Novo: azul bebê suave para fundo do galão */
 }
 
 html {
@@ -87,7 +88,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 68px;
+  height: 80px; /* Aumentado para acomodar logo maior */
 }
 
 .logo-area {
@@ -95,26 +96,35 @@ img {
   align-items: center;
 }
 
-.logo-placeholder {
+.logo-link {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--fonte-titulo);
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: var(--branco);
-  letter-spacing: 0.5px;
+  transition: opacity var(--transicao);
 }
 
-.logo-placeholder i {
-  font-size: 1.6rem;
-  color: var(--azul-agua);
+.logo-link:hover {
+  opacity: 0.9;
 }
 
-/* Se tiver logo real: */
+.remove-bg {
+  opacity: 0;
+  transition: transform var(--transicao), opacity 0.5s ease;
+}
+
+.remove-bg.processed {
+  opacity: 1;
+}
+
 .logo-img {
-  height: 48px;
+  height: 110px; /* Logo maior e impactante */
   width: auto;
+  display: block;
+  filter: contrast(1.08) saturate(1.05); /* Nitidez sutil */
+  image-rendering: -webkit-optimize-contrast; /* Otimização de nitidez do navegador */
+}
+
+.logo-link:hover .logo-img {
+  transform: scale(1.05);
 }
 
 .nav-list {
@@ -248,10 +258,19 @@ img {
 
 .hero-main-img {
   width: 100%;
-  max-width: 450px;
+  max-width: 380px; /* Reduzido para diminuir o zoom */
   height: auto;
   filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
   animation: float 6s ease-in-out infinite;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-image-wrapper .jug-backdrop {
+  width: 320px;
+  height: 320px;
+  border-radius: 60px;
+  opacity: 0.6;
 }
 
 @keyframes float {
@@ -418,20 +437,29 @@ img {
   line-height: 1.2;
 }
 
-.section-title-white {
-  color: var(--branco);
-}
-
 .section-subtitle {
   font-size: 1rem;
-  color: var(--cinza-texto);
+  color: var(--azul-escuro); /* Unificado */
   max-width: 560px;
   margin: 0 auto;
   line-height: 1.7;
 }
 
+.highlight {
+  color: var(--azul-escuro); /* Unificado */
+}
+
+.highlight-light {
+  color: var(--azul-escuro); /* Unificado */
+  font-weight: 800;
+}
+
+.section-title-white {
+  color: var(--branco);
+}
+
 .section-subtitle-white {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255,255,255,0.85);
 }
 
 /* ---------- DIFERENCIAIS ---------- */
@@ -551,17 +579,41 @@ img {
   background: var(--branco);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  position: relative; /* Para o backdrop */
+}
+
+.jug-backdrop {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  width: 140px;
+  height: 140px;
+  background: var(--azul-bebe-soft);
+  border-radius: 30px;
+  filter: blur(20px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.remove-bg {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transition: transform var(--transicao), opacity 0.5s ease;
 }
 
 .produto-real-img {
-  max-height: 100%;
-  max-width: 100%;
-  object-fit: cover; /* Ajustado para preencher melhor se for quadrada */
+  max-height: 90%;
+  max-width: 90%;
+  object-fit: contain; /* Para não cortar a imagem */
   transition: transform 0.5s var(--transicao);
+  position: relative;
+  z-index: 2;
 }
 
 .produto-card:hover .produto-real-img {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.05) rotate(3deg);
 }
 
 .produto-nome {
@@ -812,6 +864,11 @@ textarea {
   display: block;
 }
 
+/* Ajuste específico para o Caminhão 1 para mostrar o veículo inteiro e cortar a esquerda */
+.caminhao-card:nth-child(1) .caminhao-foto {
+  object-position: 50% 60%;
+}
+
 .placeholder-foto {
   background: linear-gradient(135deg, var(--azul-escuro), var(--azul-medio));
   display: flex;
@@ -946,6 +1003,15 @@ textarea {
   gap: 8px;
 }
 
+.highlight {
+  color: #1976d2; /* Azul um pouco mais intenso e escuro */
+}
+
+.highlight-light {
+  color: #29b6f6; /* Azul um pouco mais intenso e escuro */
+  font-weight: 800;
+}
+
 .info-card i {
   font-size: 1.4rem;
   color: var(--azul-claro);
@@ -1046,16 +1112,12 @@ textarea {
 .footer-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-family: var(--fonte-titulo);
-  font-size: 1.2rem;
-  font-weight: 900;
-  color: var(--branco);
+  justify-content: center;
 }
 
-.footer-logo i {
-  color: var(--azul-agua);
-  font-size: 1.4rem;
+.footer-logo .logo-img {
+  height: 80px; /* Logo maior no rodapé também */
+  filter: contrast(1.08) saturate(1.05) brightness(0.95);
 }
 
 .footer-text {

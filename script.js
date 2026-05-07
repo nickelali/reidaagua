@@ -413,6 +413,52 @@ function initAnimacoes() {
   }
 }
 
+// ===== PROCESSAMENTO DE IMAGENS (REMOÇÃO DE FUNDO) =====
+function initBGRemoval() {
+  const targets = document.querySelectorAll('.remove-bg');
+  
+  targets.forEach(img => {
+    const process = () => {
+      if (img.classList.contains('processed')) return;
+      
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Threshold para branco (ajustável se o fundo não for branco puro)
+        const threshold = 245; 
+        
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i+1];
+            const b = data[i+2];
+            
+            if (r > threshold && g > threshold && b > threshold) {
+                data[i+3] = 0;
+            }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        img.src = canvas.toDataURL('image/png');
+        img.classList.add('processed');
+      } catch (e) {
+        console.warn('Não foi possível processar a transparência da imagem:', e);
+        img.classList.add('processed');
+      }
+    };
+
+    if (img.complete) process();
+    else img.addEventListener('load', process);
+  });
+}
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', () => {
   carregarDados();
@@ -422,6 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPedido();
   initFooter();
   initScrollSuave();
+  initBGRemoval();
 
   // Pequeno delay para animações não conflitarem com o carregamento
   setTimeout(initAnimacoes, 100);
