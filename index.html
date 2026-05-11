@@ -75,7 +75,7 @@
     <div class="container hero-layout">
       <div class="hero-text-content reveal">
         <div class="hero-badge">Entrega Premium em Curitiba</div>
-        <h1 class="hero-title">Água pura na sua<br /><span class="highlight">porta todo dia</span></h1>
+        <h1 class="hero-title">Qualidade que<br /><span class="highlight">governa</span></h1>
         <p class="hero-subtitle">Galões de 20L e 10L entregues diretamente para distribuidoras, mercados e residências em Curitiba com pontualidade e qualidade real.</p>
         <div class="hero-buttons">
           <a href="#pedido" class="btn btn-primary">
@@ -89,7 +89,7 @@
       <div class="hero-image-area reveal">
         <div class="hero-image-wrapper">
           <div class="jug-backdrop"></div>
-          <img src="assets/jugs_requinte.png" alt="Galões de Água Requinte Premium" class="hero-main-img remove-bg" />
+          <img src="assets/jugs_requinte_v2.png" alt="Galões de Água Requinte Premium" class="hero-main-img remove-bg" />
           <div class="hero-floating-card card-1">
             <i class="fa-solid fa-droplet"></i>
             <span>100% Pura</span>
@@ -150,7 +150,7 @@
           <div class="produto-badge">Mais Vendido</div>
           <div class="produto-img-container">
             <div class="jug-backdrop"></div>
-            <img src="assets/jugs_requinte.png" alt="Galão 20 Litros Requinte" class="produto-real-img remove-bg" />
+            <img src="assets/jugs_requinte_v2.png" alt="Galão 20 Litros Requinte" class="produto-real-img remove-bg" />
           </div>
           <h3 class="produto-nome">Galão 20 Litros</h3>
           <p class="produto-desc">Ideal para distribuidoras, mercados, escritórios e famílias. O clássico galão de 20L com água mineral pura.</p>
@@ -164,7 +164,7 @@
         <div class="produto-card reveal">
           <div class="produto-img-container">
             <div class="jug-backdrop"></div>
-            <img src="assets/jugs_requinte.png" alt="Galão 10 Litros Requinte" class="produto-real-img remove-bg" />
+            <img src="assets/jugs_requinte_v2.png" alt="Galão 10 Litros Requinte" class="produto-real-img remove-bg" />
           </div>
           <h3 class="produto-nome">Galão 10 Litros</h3>
           <p class="produto-desc">Perfeito para espaços menores, consultórios, pequenos comércios e uso doméstico com menor consumo.</p>
@@ -229,19 +229,40 @@
       <div class="caminhoes-grid">
 
         <div class="caminhao-card reveal">
-          <img src="assets/truck1_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega norte de Curitiba" class="caminhao-foto" loading="lazy" />
+          <div class="caminhao-img-wrapper">
+            <img src="assets/truck1_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega norte de Curitiba" class="caminhao-foto" loading="lazy" />
+          </div>
           <div class="caminhao-info">
             <h3>Caminhão 1</h3>
           </div>
         </div>
 
         <div class="caminhao-card reveal">
-          <img src="assets/truck2_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega sul de Curitiba" class="caminhao-foto" loading="lazy" />
+          <div class="caminhao-img-wrapper">
+            <img src="assets/truck2_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega sul de Curitiba" class="caminhao-foto" loading="lazy" />
+          </div>
           <div class="caminhao-info">
             <h3>Caminhão 2</h3>
           </div>
         </div>
 
+      </div>
+
+      <!-- Painel de edição da frota -->
+      <div class="frota-editor" id="frota-editor" role="region" aria-labelledby="frota-editor-title">
+        <h3 id="frota-editor-title"><i class="fa-solid fa-camera" aria-hidden="true"></i> Atualizar Fotos da Frota</h3>
+        <div class="frota-inputs">
+          <div class="frota-input-group">
+            <label for="input-truck1">URL Foto Caminhão 1</label>
+            <input type="text" id="input-truck1" placeholder="Link da imagem (Ex: assets/novo-truck.jpg)" />
+          </div>
+          <div class="frota-input-group">
+            <label for="input-truck2">URL Foto Caminhão 2</label>
+            <input type="text" id="input-truck2" placeholder="Link da imagem" />
+          </div>
+          <button class="btn btn-primary" id="btn-salvar-frota">Salvar Fotos</button>
+        </div>
+        <p class="preco-hint">Insira o caminho da imagem ou um link da internet. As fotos são salvas no seu navegador.</p>
       </div>
     </div>
   </section>
@@ -350,12 +371,12 @@
           <span class="contato-link">Ver perfil →</span>
         </a>
 
-        <div class="contato-card">
+        <a href="#rotas" class="contato-card">
           <div class="contato-icon contato-icon-local"><i class="fa-solid fa-map-location-dot"></i></div>
           <h3>Área de Atendimento</h3>
           <p>Curitiba — PR</p>
           <span class="contato-link">Veja as rotas ↑</span>
-        </div>
+        </a>
 
       </div>
     </div>

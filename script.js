@@ -25,6 +25,7 @@ const rotasPadrao = [
 // ===== ESTADO DA APLICAÇÃO =====
 let precos = { p20: null, p10: null };
 let rotas  = [...rotasPadrao];
+let frota  = { t1: null, t2: null };
 
 // ===== UTILITÁRIOS =====
 function formatarMoeda(valor) {
@@ -52,14 +53,17 @@ function mostrarToast(msg, tipo = 'success') {
 function salvarDados() {
   localStorage.setItem('rda_precos', JSON.stringify(precos));
   localStorage.setItem('rda_rotas',  JSON.stringify(rotas));
+  localStorage.setItem('rda_frota',  JSON.stringify(frota));
 }
 
 function carregarDados() {
   try {
     const p = localStorage.getItem('rda_precos');
     const r = localStorage.getItem('rda_rotas');
+    const f = localStorage.getItem('rda_frota');
     if (p) precos = JSON.parse(p);
     if (r) rotas  = JSON.parse(r);
+    if (f) frota  = JSON.parse(f);
   } catch (e) {
     console.warn('Erro ao carregar dados salvos:', e);
   }
@@ -423,7 +427,7 @@ function initBGRemoval() {
       
       try {
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
@@ -431,31 +435,94 @@ function initBGRemoval() {
         
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imageData.data;
+        const width = canvas.width;
+        const height = canvas.height;
         
-        // Threshold para branco (ajustável se o fundo não for branco puro)
-        const threshold = 245; 
+        const visited = new Uint8Array(width * height);
+        const stack = [];
+        for (let x = 0; x < width; x++) { stack.push([x, 0]); stack.push([x, height - 1]); }
+        for (let y = 0; y < height; y++) { stack.push([0, y]); stack.push([width - 1, y]); }
         
-        for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i+1];
-            const b = data[i+2];
-            
-            if (r > threshold && g > threshold && b > threshold) {
+        const isLogo = img.src.toLowerCase().includes('logo');
+        const tolerance = isLogo ? 85 : 35; // Tolerância maior para a logo para tirar todo o branco
+        
+        // Cor de referência (branco puro)
+        const refR = 255, refG = 255, refB = 255;
+        
+        while (stack.length > 0) {
+          const [x, y] = stack.pop();
+          const idx = y * width + x;
+          if (visited[idx]) continue;
+          visited[idx] = 1;
+          
+          const p = idx * 4;
+          const r = data[p], g = data[p+1], b = data[p+2];
+          const dist = Math.sqrt((r - refR)**2 + (g - refG)**2 + (b - refB)**2);
+          
+          if (dist < tolerance) {
+            data[p+3] = 0;
+            if (x + 1 < width) stack.push([x + 1, y]);
+            if (x - 1 >= 0) stack.push([x - 1, y]);
+            if (y + 1 < height) stack.push([y + 1, y]);
+            if (y - 1 >= 0) stack.push([y - 1, y]);
+          }
+        }
+
+        // Pass 2: Global scan for internal "islands" (only for logo)
+        if (isLogo) {
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i+3] > 0) {
+              const r = data[i], g = data[i+1], b = data[i+2];
+              const dist = Math.sqrt((r - refR)**2 + (g - refG)**2 + (b - refB)**2);
+              // Tolerância um pouco mais restrita para não apagar o texto branco pequeno
+              if (dist < (tolerance * 0.7)) {
                 data[i+3] = 0;
+              }
             }
+          }
         }
         
         ctx.putImageData(imageData, 0, 0);
         img.src = canvas.toDataURL('image/png');
         img.classList.add('processed');
       } catch (e) {
-        console.warn('Não foi possível processar a transparência da imagem:', e);
+        console.warn('BG removal failed:', e);
         img.classList.add('processed');
       }
     };
-
     if (img.complete) process();
     else img.addEventListener('load', process);
+  });
+}
+
+// ===== FROTA (CAMINHÕES) =====
+function renderizarFrota() {
+  const truck1Img = document.querySelector('.caminhao-card:nth-child(1) .caminhao-foto');
+  const truck2Img = document.querySelector('.caminhao-card:nth-child(2) .caminhao-foto');
+
+  if (frota.t1) truck1Img.src = frota.t1;
+  if (frota.t2) truck2Img.src = frota.t2;
+
+  // Preencher inputs se estiver logado
+  if (document.body.classList.contains('admin-logged-in')) {
+    document.getElementById('input-truck1').value = frota.t1 || '';
+    document.getElementById('input-truck2').value = frota.t2 || '';
+  }
+}
+
+function initFrota() {
+  renderizarFrota();
+
+  document.getElementById('btn-salvar-frota').addEventListener('click', () => {
+    const t1 = document.getElementById('input-truck1').value.trim();
+    const t2 = document.getElementById('input-truck2').value.trim();
+
+    frota.t1 = t1 || null;
+    frota.t2 = t2 || null;
+
+    salvarDados();
+    renderizarFrota();
+    mostrarToast('Fotos da frota atualizadas com sucesso!');
   });
 }
 
@@ -469,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFooter();
   initScrollSuave();
   initBGRemoval();
+  initFrota();
 
   // Pequeno delay para animações não conflitarem com o carregamento
   setTimeout(initAnimacoes, 100);
