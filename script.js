@@ -10,6 +10,12 @@ const CONFIG = {
   diasAbrev:  ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
 };
 
+let customConfig = {
+  whatsapp: '5541985231501',
+  instagram: 'reidaaguaa',
+  adminSenha: 'reidaagua@'
+};
+
 // ===== ROTAS PADRÃO =====
 // Cada índice corresponde ao dia da semana (0=Dom, 1=Seg, ..., 6=Sáb)
 const rotasPadrao = [
@@ -26,6 +32,7 @@ const rotasPadrao = [
 let precos = { p20: null, p10: null };
 let rotas  = [...rotasPadrao];
 let frota  = { t1: null, t2: null };
+let pedidos = [];
 
 // ===== UTILITÁRIOS =====
 function formatarMoeda(valor) {
@@ -54,6 +61,8 @@ function salvarDados() {
   localStorage.setItem('rda_precos', JSON.stringify(precos));
   localStorage.setItem('rda_rotas',  JSON.stringify(rotas));
   localStorage.setItem('rda_frota',  JSON.stringify(frota));
+  localStorage.setItem('rda_pedidos', JSON.stringify(pedidos));
+  localStorage.setItem('rda_config', JSON.stringify(customConfig));
 }
 
 function carregarDados() {
@@ -61,9 +70,13 @@ function carregarDados() {
     const p = localStorage.getItem('rda_precos');
     const r = localStorage.getItem('rda_rotas');
     const f = localStorage.getItem('rda_frota');
+    const d = localStorage.getItem('rda_pedidos');
+    const c = localStorage.getItem('rda_config');
     if (p) precos = JSON.parse(p);
     if (r) rotas  = JSON.parse(r);
     if (f) frota  = JSON.parse(f);
+    if (d) pedidos = JSON.parse(d);
+    if (c) customConfig = JSON.parse(c);
   } catch (e) {
     console.warn('Erro ao carregar dados salvos:', e);
   }
@@ -187,79 +200,41 @@ function renderizarRotas() {
     }
 
     const regiaoDiv = document.createElement('div');
-    if (rotas[idx] && rotas[idx].trim()) {
-      regiaoDiv.className = 'rota-dia-regioes';
-      regiaoDiv.textContent = rotas[idx];
-    } else {
-      regiaoDiv.className = 'rota-dia-vazio';
-      regiaoDiv.textContent = idx === 0 ? 'Sem entrega' : 'A definir';
-    }
+    const regioesTexto = (rotas[idx] && rotas[idx].trim()) ? rotas[idx] : (idx === 0 ? 'Sem entrega' : 'A definir');
+    
+    regiaoDiv.className = (rotas[idx] && rotas[idx].trim()) ? 'rota-dia-regioes' : 'rota-dia-vazio';
+    regiaoDiv.innerHTML = `
+      <span class="rota-texto-estatico">${regioesTexto}</span>
+      <div class="admin-rota-input">
+        <input type="text" value="${rotas[idx] || ''}" 
+               placeholder="${idx === 0 ? 'Sem entrega' : 'Regiões...'}" 
+               data-idx="${idx}" class="input-rota-dinamico">
+      </div>
+    `;
     div.appendChild(regiaoDiv);
 
     container.appendChild(div);
   });
 }
 
-function renderizarEditorRotas() {
-  const grid  = document.getElementById('rotas-editor-grid');
-  grid.innerHTML = '';
 
-  const ordem = [1, 2, 3, 4, 5, 6, 0];
-
-  ordem.forEach(idx => {
-    const item = document.createElement('div');
-    item.className = 'rota-editor-item';
-
-    const label = document.createElement('label');
-    label.setAttribute('for', `rota-input-${idx}`);
-    label.textContent = CONFIG.diasSemana[idx];
-
-    const input = document.createElement('input');
-    input.type        = 'text';
-    input.id          = `rota-input-${idx}`;
-    input.placeholder = idx === 0 ? 'Ex: Sem entrega' : 'Ex: Centro, Batel...';
-    input.value       = rotas[idx] || '';
-
-    item.appendChild(label);
-    item.appendChild(input);
-    grid.appendChild(item);
-  });
-}
 
 function initRotas() {
   renderizarRotas();
-  renderizarEditorRotas();
 
   document.getElementById('btn-salvar-rotas').addEventListener('click', () => {
+    const inputs = document.querySelectorAll('.input-rota-dinamico');
+    inputs.forEach(input => {
+      const idx = parseInt(input.getAttribute('data-idx'));
+      rotas[idx] = input.value.trim();
+    });
+
     salvarDados();
     renderizarRotas();
     mostrarToast('Rotas atualizadas com sucesso!');
   });
-
-  // Live Preview de Rotas (Feedback instantâneo no site ao digitar no admin)
-  const ordem = [1, 2, 3, 4, 5, 6, 0];
-  ordem.forEach(idx => {
-    const input = document.getElementById(`rota-input-${idx}`);
-    if (input) {
-      input.addEventListener('input', () => {
-        const diasCards = document.querySelectorAll('.rota-dia');
-        const cardIndex = ordem.indexOf(idx);
-        const card = diasCards[cardIndex];
-        if (!card) return;
-
-        let regiaoDiv = card.querySelector('.rota-dia-regioes') || card.querySelector('.rota-dia-vazio');
-        
-        if (input.value.trim()) {
-          regiaoDiv.className = 'rota-dia-regioes';
-          regiaoDiv.textContent = input.value.trim();
-        } else {
-          regiaoDiv.className = 'rota-dia-vazio';
-          regiaoDiv.textContent = idx === 0 ? 'Sem entrega' : 'A definir';
-        }
-      });
-    }
-  });
 }
+
 
 // ===== PEDIDO =====
 function atualizarResumoPedido() {
@@ -307,6 +282,7 @@ function initPedido() {
     const qtd20   = parseInt(qtd20Input.value) || 0;
     const qtd10   = parseInt(qtd10Input.value) || 0;
     const turno   = document.getElementById('turno').value;
+    const telefone = document.getElementById('telefone').value.trim();
     const obs     = document.getElementById('obs').value.trim();
 
     // Validação básica
@@ -330,6 +306,8 @@ function initPedido() {
     msg += `------------------------------------------\n\n`;
     msg += `👤 *CLIENTE:* ${nome}\n`;
     msg += `📍 *ENDEREÇO:* ${end}\n`;
+    msg += `📅 *DATA/HORA:* ${new Date().toLocaleString('pt-BR')}\n`;
+    if (telefone) msg += `📞 *TEL:* ${telefone}\n`;
     if (turno) msg += `⏰ *TURNO:* ${turno}\n`;
     msg += `\n📦 *ITENS DO PEDIDO:*\n`;
     
@@ -340,10 +318,11 @@ function initPedido() {
       msg += `▪️ Galão 10L: ${qtd10} un. ${precos.p10 ? '(_' + formatarMoeda(qtd10 * precos.p10) + '_)' : ''}\n`;
     }
 
+    let total = 0;
+    if (precos.p20) total += qtd20 * precos.p20;
+    if (precos.p10) total += qtd10 * precos.p10;
+
     if (precos.p20 !== null || precos.p10 !== null) {
-      let total = 0;
-      if (precos.p20) total += qtd20 * precos.p20;
-      if (precos.p10) total += qtd10 * precos.p10;
       msg += `\n💰 *TOTAL ESTIMADO:* ${formatarMoeda(total)}\n`;
     }
 
@@ -351,6 +330,24 @@ function initPedido() {
     
     msg += `\n------------------------------------------\n`;
     msg += `_Enviado via reidaagua.com.br_`;
+
+    // Salvar localmente para a área adm
+    const novoPedido = {
+      id: Date.now(),
+      data: new Date().toLocaleString('pt-BR'),
+      nome,
+      endereco: end,
+      telefone,
+      qtd20,
+      qtd10,
+      total: formatarMoeda(total),
+      status: 'pendente',
+      pagamento: 'pendente'
+    };
+    pedidos.unshift(novoPedido);
+    if (pedidos.length > 50) pedidos.pop();
+    salvarDados();
+    renderizarPedidosAdmin();
 
     const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
@@ -361,6 +358,20 @@ function initPedido() {
 function initFooter() {
   const el = document.getElementById('ano');
   if (el) el.textContent = new Date().getFullYear();
+  aplicarConfiguracoes();
+}
+
+function aplicarConfiguracoes() {
+  // WhatsApp
+  const whats = customConfig.whatsapp;
+  const whatsLink = `https://wa.me/${whats}`;
+  document.querySelectorAll('.link-wpp-href').forEach(a => a.href = whatsLink);
+  
+  // Instagram
+  const insta = customConfig.instagram.replace('@', '');
+  const instaLink = `https://instagram.com/${insta}`;
+  document.querySelectorAll('.link-insta-href').forEach(a => a.href = instaLink);
+  document.querySelectorAll('.link-insta-text').forEach(p => p.textContent = `@${insta}`);
 }
 
 // ===== SCROLL SUAVE PARA ÂNCORAS =====
@@ -468,16 +479,15 @@ function initBGRemoval() {
           }
         }
 
-        // Pass 2: Global scan for internal "islands" (only for logo)
-        if (isLogo) {
-          for (let i = 0; i < data.length; i += 4) {
-            if (data[i+3] > 0) {
-              const r = data[i], g = data[i+1], b = data[i+2];
-              const dist = Math.sqrt((r - refR)**2 + (g - refG)**2 + (b - refB)**2);
-              // Tolerância um pouco mais restrita para não apagar o texto branco pequeno
-              if (dist < (tolerance * 0.7)) {
-                data[i+3] = 0;
-              }
+        // Pass 2: Global scan for internal "islands" (handles, gaps)
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i+3] > 0) {
+            const r = data[i], g = data[i+1], b = data[i+2];
+            const dist = Math.sqrt((r - refR)**2 + (g - refG)**2 + (b - refB)**2);
+            // Tolerância rigorosa para "ilhas" (para não apagar brilhos do plástico)
+            const islandTolerance = isLogo ? (tolerance * 0.7) : 25; 
+            if (dist < islandTolerance) {
+              data[i+3] = 0;
             }
           }
         }
@@ -492,6 +502,233 @@ function initBGRemoval() {
     };
     if (img.complete) process();
     else img.addEventListener('load', process);
+  });
+}
+
+// ===== PEDIDOS RECEBIDOS (ADMIN) =====
+function renderizarPedidosAdmin() {
+  const lista = document.getElementById('pedidos-lista');
+  if (!lista) return;
+
+  if (pedidos.length === 0) {
+    lista.innerHTML = '<p class="preco-hint">Ainda não há pedidos.</p>';
+    return;
+  }
+
+  lista.innerHTML = pedidos.map(p => `
+    <div class="pedido-item ${p.status === 'atendido' ? 'atendido' : ''}">
+      <div class="pedido-item-details">
+        <div class="pedido-status-area">
+          <span class="pedido-status-badge ${p.status}">${p.status.toUpperCase()}</span>
+          <span class="pedido-pagamento-badge ${p.pagamento}">${p.pagamento === 'pago' ? 'PAGO' : 'PAG. PENDENTE'}</span>
+          <span class="pedido-item-data">${p.data}</span>
+        </div>
+      </div>
+      <div class="pedido-item-detalhes">
+        <p>📍 <strong>End:</strong> ${p.endereco}</p>
+        ${p.telefone ? `<p>📞 <strong>Tel:</strong> ${p.telefone}</p>` : ''}
+        <p>📦 <strong>Itens:</strong> ${p.qtd20 > 0 ? p.qtd20 + 'x 20L ' : ''}${p.qtd10 > 0 ? p.qtd10 + 'x 10L' : ''}</p>
+        <p>💰 <strong>Total:</strong> ${p.total}</p>
+      </div>
+      <div class="pedido-item-actions">
+        <div class="pedido-actions-group">
+          <button class="btn ${p.status === 'atendido' ? 'btn-outline' : 'btn-primary'} btn-sm" 
+                  onclick="toggleStatusPedido(${p.id})">
+            ${p.status === 'atendido' ? 'Pendente' : 'Atender'}
+          </button>
+          <button class="btn ${p.pagamento === 'pago' ? 'btn-outline' : 'btn-success'} btn-sm" 
+                  onclick="togglePagamentoPedido(${p.id})">
+            ${p.pagamento === 'pago' ? 'Marcar Pendente' : 'Marcar Pago'}
+          </button>
+        </div>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="excluirPedido(${p.id})" title="Excluir Pedido">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      ${p.telefone ? `
+        <div class="pedido-item-footer" style="margin-top: 10px;">
+          <button class="btn btn-success btn-sm btn-full" onclick="abrirWhatsCliente('${p.telefone}')">
+            <i class="fa-brands fa-whatsapp"></i> Falar com Cliente
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+  
+  renderizarRelatoriosAdmin();
+}
+
+function togglePagamentoPedido(id) {
+  const pedido = pedidos.find(p => p.id === id);
+  if (pedido) {
+    pedido.pagamento = pedido.pagamento === 'pago' ? 'pendente' : 'pago';
+    salvarDados();
+    renderizarPedidosAdmin();
+    mostrarToast(`Pagamento de ${pedido.nome} atualizado!`);
+  }
+}
+
+function toggleStatusPedido(id) {
+  const pedido = pedidos.find(p => p.id === id);
+  if (pedido) {
+    pedido.status = pedido.status === 'atendido' ? 'pendente' : 'atendido';
+    salvarDados();
+    renderizarPedidosAdmin();
+    mostrarToast(`Pedido de ${pedido.nome} atualizado!`);
+  }
+}
+
+function excluirPedido(id) {
+  if (confirm('Deseja realmente excluir este pedido do histórico?')) {
+    const idStr = String(id);
+    pedidos = pedidos.filter(p => String(p.id) !== idStr);
+    salvarDados();
+    renderizarPedidosAdmin();
+    mostrarToast('Pedido removido com sucesso.');
+  }
+}
+
+// ===== RELATÓRIOS (ADMIN) =====
+function renderizarRelatoriosAdmin() {
+  const container = document.getElementById('relatorios-lista');
+  if (!container) return;
+
+  if (pedidos.length === 0) {
+    container.innerHTML = '<p class="preco-hint">Ainda não há pedidos.</p>';
+    return;
+  }
+
+  // Agrupar por cliente
+  const clientesMap = {};
+  pedidos.forEach(p => {
+    const nome = p.nome.trim();
+    if (!clientesMap[nome]) {
+      clientesMap[nome] = { nome, totalPedidos: 0, temPendencia: false, ultimoPedido: p.data };
+    }
+    clientesMap[nome].totalPedidos++;
+    if (p.pagamento === 'pendente') {
+      clientesMap[nome].temPendencia = true;
+    }
+  });
+
+  const clientesRanking = Object.values(clientesMap).sort((a, b) => b.totalPedidos - a.totalPedidos);
+
+  container.innerHTML = `
+    <table class="relatorio-table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Qtd</th>
+          <th>Último Pedido</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${clientesRanking.map(c => `
+          <tr>
+            <td class="td-nome" onclick='verDetalhesCliente(${JSON.stringify(c.nome)})'>${c.nome}</td>
+            <td>${c.totalPedidos}</td>
+            <td class="td-data">${c.ultimoPedido}</td>
+            <td>
+              <span class="badge-financeiro ${c.temPendencia ? 'debito' : 'ok'}">
+                ${c.temPendencia ? 'DÉBITO' : 'EM DIA'}
+              </span>
+            </td>
+            <td class="td-acoes-bulk">
+              <button class="btn btn-success btn-xs" onclick='marcarTudoPagoCliente(${JSON.stringify(c.nome)})' title="Marcar Tudo Pago">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <button class="btn btn-warning btn-xs" onclick='marcarTudoPendenteCliente(${JSON.stringify(c.nome)})' title="Marcar Tudo Pendente">
+                <i class="fa-solid fa-clock"></i>
+              </button>
+              <button class="btn btn-danger btn-xs" onclick='excluirTudoCliente(${JSON.stringify(c.nome)})' title="Excluir Tudo">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function marcarTudoPagoCliente(nome) {
+  pedidos.forEach(p => {
+    if (p.nome.trim() === nome) p.pagamento = 'pago';
+  });
+  salvarDados();
+  renderizarPedidosAdmin();
+  mostrarToast(`Todos os pedidos de ${nome} marcados como pagos.`);
+}
+
+function marcarTudoPendenteCliente(nome) {
+  pedidos.forEach(p => {
+    if (p.nome.trim() === nome) p.pagamento = 'pendente';
+  });
+  salvarDados();
+  renderizarPedidosAdmin();
+  mostrarToast(`Todos os pedidos de ${nome} marcados como pendentes.`);
+}
+
+function excluirTudoCliente(nome) {
+  if (confirm(`Deseja excluir TODOS os pedidos de "${nome}"? Esta ação não pode ser desfeita.`)) {
+    const nomeLimpo = String(nome).trim().toLowerCase();
+    pedidos = pedidos.filter(p => String(p.nome).trim().toLowerCase() !== nomeLimpo);
+    salvarDados();
+    renderizarPedidosAdmin();
+    mostrarToast(`Todo o histórico de "${nome}" foi removido.`);
+  }
+}
+
+function initPedidosAdmin() {
+  renderizarPedidosAdmin();
+
+  document.getElementById('btn-limpar-pedidos').addEventListener('click', () => {
+    if (confirm('Deseja realmente limpar todo o histórico de pedidos?')) {
+      pedidos = [];
+      salvarDados();
+      renderizarPedidosAdmin();
+      mostrarToast('Histórico de pedidos limpo.');
+    }
+  });
+}
+
+// ===== CONFIGURAÇÕES (ADMIN) =====
+function initSettingsAdmin() {
+  const inputWhatsapp = document.getElementById('input-whatsapp');
+  const inputInsta    = document.getElementById('input-insta');
+  const inputSenhaNova = document.getElementById('input-senha-nova');
+  const btnSalvar = document.getElementById('btn-salvar-settings');
+
+  if (!btnSalvar) return;
+
+  // Preencher valores atuais
+  inputWhatsapp.value = customConfig.whatsapp;
+  inputInsta.value    = customConfig.instagram;
+  inputSenhaNova.value = customConfig.adminSenha;
+
+  btnSalvar.addEventListener('click', () => {
+    const whats = inputWhatsapp.value.trim();
+    const insta = inputInsta.value.trim();
+    const senha = inputSenhaNova.value.trim();
+
+    if (!whats) {
+      mostrarToast('O WhatsApp não pode ficar vazio.', 'error');
+      return;
+    }
+    if (senha.length < 4) {
+      mostrarToast('A senha deve ter pelo menos 4 caracteres.', 'error');
+      return;
+    }
+
+    customConfig.whatsapp = whats;
+    customConfig.instagram = insta;
+    customConfig.adminSenha = senha;
+
+    salvarDados();
+    aplicarConfiguracoes();
+    mostrarToast('Configurações salvas com sucesso!');
   });
 }
 
@@ -513,6 +750,7 @@ function renderizarFrota() {
 function initFrota() {
   renderizarFrota();
 
+  // Salvar links de texto
   document.getElementById('btn-salvar-frota').addEventListener('click', () => {
     const t1 = document.getElementById('input-truck1').value.trim();
     const t2 = document.getElementById('input-truck2').value.trim();
@@ -524,11 +762,46 @@ function initFrota() {
     renderizarFrota();
     mostrarToast('Fotos da frota atualizadas com sucesso!');
   });
+
+  // Upload de arquivos (Galeria)
+  document.querySelectorAll('.file-upload-input').forEach(input => {
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const truckKey = e.target.dataset.truck; // 't1' ou 't2'
+      
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) { // Limite de 2MB para evitar estourar o localStorage
+          mostrarToast('A imagem é muito grande. Tente uma menor que 2MB.', 'error');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const base64 = event.target.result;
+          frota[truckKey] = base64;
+          
+          // Preview imediato no input e na imagem
+          document.getElementById(`input-truck${truckKey === 't1' ? '1' : '2'}`).value = 'Imagem da Galeria (Base64)';
+          renderizarFrota();
+          mostrarToast('Imagem carregada! Clique em salvar para confirmar.');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
 }
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Carregar dados do localStorage
   carregarDados();
+  
+  // 2. Verificar se está logado (agora usando localStorage para persistência total)
+  if (localStorage.getItem(ADMIN_CONFIG.sessionKey) === 'true') {
+    document.body.classList.add('admin-logged-in');
+  }
+
+  // 3. Inicializar componentes (já cientes do estado admin)
   initNavbar();
   initPrecos();
   initRotas();
@@ -537,6 +810,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollSuave();
   initBGRemoval();
   initFrota();
+  initPedidosAdmin();
+  initSettingsAdmin();
+  initAdmin(); // Configura eventos do modal
 
   // Pequeno delay para animações não conflitarem com o carregamento
   setTimeout(initAnimacoes, 100);
@@ -558,9 +834,8 @@ function initAdmin() {
   const btnCancelar   = document.getElementById('btn-cancelar-senha');
   const btnConfirmar  = document.getElementById('btn-confirmar-senha');
 
-  // Verificar se já está logado nesta sessão
-  if (sessionStorage.getItem(ADMIN_CONFIG.sessionKey) === 'true') {
-    document.body.classList.add('admin-logged-in');
+  // Verificar estado para o ícone
+  if (document.body.classList.contains('admin-logged-in')) {
     loginBtn.title = 'Sair da Área Administrativa';
   }
 
@@ -569,9 +844,10 @@ function initAdmin() {
     if (document.body.classList.contains('admin-logged-in')) {
       if (confirm('Deseja sair da área administrativa?')) {
         document.body.classList.remove('admin-logged-in');
-        sessionStorage.removeItem(ADMIN_CONFIG.sessionKey);
+        localStorage.removeItem(ADMIN_CONFIG.sessionKey);
         loginBtn.title = 'Área do Proprietário';
         mostrarToast('Você saiu da área administrativa.');
+        window.location.href = window.location.pathname; // Vai para o topo e limpa a hash
       }
     } else {
       modal.classList.add('show');
@@ -587,15 +863,15 @@ function initAdmin() {
 
   // Confirmar senha
   function validarSenha() {
-    if (inputSenha.value === ADMIN_CONFIG.senhaCorreta) {
+    if (inputSenha.value === customConfig.adminSenha) {
       document.body.classList.add('admin-logged-in');
-      sessionStorage.setItem(ADMIN_CONFIG.sessionKey, 'true');
+      localStorage.setItem(ADMIN_CONFIG.sessionKey, 'true');
       modal.classList.remove('show');
       loginBtn.title = 'Sair da Área Administrativa';
       mostrarToast('Acesso administrativo liberado!');
       
-      // Rolar para a seção de preços para facilitar
-      document.getElementById('produtos').scrollIntoView({ behavior: 'smooth' });
+      // Ir para o topo e recarregar para aplicar mudanças visuais
+      window.location.href = window.location.pathname;
     } else {
       mostrarToast('Senha incorreta!', 'error');
       inputSenha.value = '';
@@ -612,6 +888,77 @@ function initAdmin() {
   modal.addEventListener('click', (e) => {
     if (e.target === modal) modal.classList.remove('show');
   });
+
+  // Modal Detalhes do Cliente
+  const modalDetalhes = document.getElementById('modal-detalhes-cliente');
+  const btnFecharDetalhes = document.getElementById('btn-fechar-detalhes');
+  if (btnFecharDetalhes) {
+    btnFecharDetalhes.addEventListener('click', () => {
+      modalDetalhes.classList.remove('show');
+    });
+  }
+  if (modalDetalhes) {
+    modalDetalhes.addEventListener('click', (e) => {
+      if (e.target === modalDetalhes) modalDetalhes.classList.remove('show');
+    });
+  }
+}
+
+function verDetalhesCliente(nome) {
+  const modal = document.getElementById('modal-detalhes-cliente');
+  const corpo = document.getElementById('detalhes-cliente-corpo');
+  const titulo = document.getElementById('detalhes-cliente-titulo');
+  
+  if (!modal || !corpo) return;
+
+  titulo.textContent = `Pedidos de ${nome}`;
+  const pedidosCliente = pedidos.filter(p => p.nome.trim() === nome.trim());
+
+  corpo.innerHTML = pedidosCliente.map(p => `
+    <div class="detalhes-pedido-box">
+      <h4>
+        <span>📅 ${p.data}</span>
+        <div class="modal-badge-group">
+          <span class="pedido-status-badge ${p.status}">${p.status.toUpperCase()}</span>
+          <span class="pedido-pagamento-badge ${p.pagamento}">${p.pagamento === 'pago' ? 'PAGO' : 'PENDENTE'}</span>
+        </div>
+      </h4>
+      <p>📦 <strong>Itens:</strong> ${p.qtd20 > 0 ? p.qtd20 + 'x 20L ' : ''}${p.qtd10 > 0 ? p.qtd10 + 'x 10L' : ''}</p>
+      <p>💰 <strong>Total:</strong> ${p.total}</p>
+      <p>📍 <strong>Endereço:</strong> ${p.endereco}</p>
+      ${p.telefone ? `<p>📞 <strong>Telefone:</strong> ${p.telefone}</p>` : ''}
+      
+      <div class="pedido-item-actions" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+        <button class="btn ${p.status === 'atendido' ? 'btn-outline' : 'btn-primary'} btn-sm" 
+                onclick="toggleStatusPedido(${p.id}); verDetalhesCliente('${nome}')">
+          ${p.status === 'atendido' ? 'Pendente' : 'Atender'}
+        </button>
+        <button class="btn ${p.pagamento === 'pago' ? 'btn-outline' : 'btn-success'} btn-sm" 
+                onclick="togglePagamentoPedido(${p.id}); verDetalhesCliente('${nome}')">
+          ${p.pagamento === 'pago' ? 'Marcar Pendente' : 'Marcar Pago'}
+        </button>
+      </div>
+      ${p.telefone ? `
+        <div style="margin-top: 10px;">
+          <button class="btn btn-whatsapp btn-sm btn-full" onclick="abrirWhatsCliente('${p.telefone}')">
+             <i class="fa-brands fa-whatsapp"></i> Falar com Cliente
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+
+  modal.classList.add('show');
+}
+
+function abrirWhatsCliente(tel) {
+  if (!tel) return;
+  const limpo = tel.replace(/\D/g, '');
+  let link = limpo;
+  if (limpo.length <= 11 && !limpo.startsWith('55')) {
+    link = '55' + limpo;
+  }
+  window.open(`https://wa.me/${link}`, '_blank');
 }
 
 // Adicionar initAdmin na inicialização

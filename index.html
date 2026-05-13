@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rei da Água — Distribuição de Galões em Curitiba</title>
 
   <!-- SEO: Meta Description -->
-  <meta name="description" content="Rei da Água: entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba e região metropolitana. Peça agora pelo WhatsApp!" />
-  <meta name="keywords" content="galão de água, entrega de água, água mineral, Curitiba, distribuição de água, galão 20 litros, galão 10 litros" />
+  <meta name="description"
+    content="Rei da Água: entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba e região metropolitana. Peça agora pelo WhatsApp!" />
+  <meta name="keywords"
+    content="galão de água, entrega de água, água mineral, Curitiba, distribuição de água, galão 20 litros, galão 10 litros" />
   <meta name="author" content="Rei da Água" />
   <meta name="robots" content="index, follow" />
 
@@ -15,7 +18,8 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nickelali.github.io/reidaagua/" />
   <meta property="og:title" content="Rei da Água — Galões de Água em Curitiba" />
-  <meta property="og:description" content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba. Pontualidade e qualidade garantidas. Peça agora!" />
+  <meta property="og:description"
+    content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba. Pontualidade e qualidade garantidas. Peça agora!" />
   <meta property="og:image" content="https://nickelali.github.io/reidaagua/og-image.jpg" />
   <meta property="og:locale" content="pt_BR" />
   <meta property="og:site_name" content="Rei da Água" />
@@ -23,7 +27,8 @@
   <!-- SEO: Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Rei da Água — Galões de Água em Curitiba" />
-  <meta name="twitter:description" content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba." />
+  <meta name="twitter:description"
+    content="Entrega de galões de 20L e 10L para distribuidoras, mercados e residências em Curitiba." />
 
   <!-- PWA: Manifest -->
   <link rel="manifest" href="manifest.json" />
@@ -40,9 +45,12 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
 
   <!-- ===== HEADER / NAVBAR ===== -->
@@ -56,10 +64,17 @@
       <nav class="nav" id="nav">
         <ul class="nav-list">
           <li><a href="#inicio" class="nav-link">Início</a></li>
-          <li><a href="#produtos" class="nav-link">Produtos</a></li>
+          <li><a href="#produtos" class="nav-link">
+            <span class="customer-title">Produtos</span>
+            <span class="admin-title">Preço</span>
+          </a></li>
           <li><a href="#rotas" class="nav-link">Rotas</a></li>
-          <li><a href="#caminhoes" class="nav-link">Nossa Frota</a></li>
-          <li><a href="#pedido" class="nav-link">Fazer Pedido</a></li>
+          <li><a href="#caminhoes" class="nav-link">
+            <span class="customer-title">Nossa Frota</span>
+            <span class="admin-title">Imagem</span>
+          </a></li>
+          <li class="admin-only-nav"><a href="#relatorios-editor" class="nav-link">Pedidos/Clientes</a></li>
+          <li class="customer-only-nav"><a href="#pedido" class="nav-link">Fazer Pedido</a></li>
           <li><a href="#contato" class="nav-link">Contato</a></li>
         </ul>
       </nav>
@@ -73,10 +88,26 @@
   <section class="hero" id="inicio">
     <div class="hero-bg-text">H2O</div>
     <div class="container hero-layout">
+      <!-- Mensagem Admin -->
+      <div class="admin-welcome-content reveal">
+        <div class="hero-badge">Painel de Controle Administrativo</div>
+        <h2 class="hero-title">Bem-vindo,<br /><span class="highlight">Jaime</span></h2>
+        <p class="hero-subtitle">Gerencie preços, rotas, frota e pedidos de forma simples e rápida.</p>
+        <div class="hero-buttons">
+          <a href="#relatorios-editor" class="btn btn-primary">
+            <i class="fa-solid fa-users"></i> Ver Clientes/Pedidos
+          </a>
+          <a href="#produtos" class="btn btn-outline">
+            <i class="fa-solid fa-tags"></i> Editar Preços
+          </a>
+        </div>
+      </div>
+
       <div class="hero-text-content reveal">
         <div class="hero-badge">Entrega Premium em Curitiba</div>
         <h1 class="hero-title">Qualidade que<br /><span class="highlight">governa</span></h1>
-        <p class="hero-subtitle">Galões de 20L e 10L entregues diretamente para distribuidoras, mercados e residências em Curitiba com pontualidade e qualidade real.</p>
+        <p class="hero-subtitle">Galões de 20L e 10L entregues diretamente para distribuidoras, mercados e residências
+          em Curitiba com pontualidade e qualidade real.</p>
         <div class="hero-buttons">
           <a href="#pedido" class="btn btn-primary">
             <i class="fa-solid fa-cart-shopping"></i> Fazer Pedido
@@ -88,8 +119,13 @@
       </div>
       <div class="hero-image-area reveal">
         <div class="hero-image-wrapper">
-          <div class="jug-backdrop"></div>
-          <img src="assets/hero_jugs.jpg" alt="Galões de Água Requinte Premium" class="hero-main-img remove-bg" />
+          <!-- <div class="jug-backdrop"></div> -->
+          <!-- Imagem Admin (Logo) -->
+          <img src="assets/logo.jpg" alt="Logo Rei da Água" class="admin-hero-logo remove-bg" />
+          
+          <!-- Imagem Cliente (Galões) -->
+          <img src="assets/jugs_requinte_v3.png" alt="Galões de Água Requinte Premium"
+            class="hero-main-img remove-bg" />
           <div class="hero-floating-card card-1">
             <i class="fa-solid fa-droplet"></i>
             <span>100% Pura</span>
@@ -103,7 +139,7 @@
     </div>
     <div class="hero-wave">
       <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f0f8ff"/>
+        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f0f8ff" />
       </svg>
     </div>
   </section>
@@ -142,7 +178,10 @@
     <div class="container">
       <div class="section-header reveal">
         <h2 class="section-title">Nossos <span class="highlight">Produtos</span></h2>
-        <p class="section-subtitle">Galões de água mineral de alta qualidade para o seu negócio ou residência.</p>
+        <p class="section-subtitle">
+          <span class="customer-subtitle">Galões de água mineral de alta qualidade para o seu negócio ou residência.</span>
+          <span class="admin-subtitle">Alguma mudança nos preços? Atualize os clientes.</span>
+        </p>
       </div>
       <div class="produtos-grid">
 
@@ -153,12 +192,18 @@
             <img src="assets/jugs_requinte_v2.png" alt="Galão 20 Litros Requinte" class="produto-real-img remove-bg" />
           </div>
           <h3 class="produto-nome">Galão 20 Litros</h3>
-          <p class="produto-desc">Ideal para distribuidoras, mercados, escritórios e famílias. O clássico galão de 20L com água mineral pura.</p>
+          <p class="produto-desc">Ideal para distribuidoras, mercados, escritórios e famílias. O clássico galão de 20L
+            com água mineral pura.</p>
           <div class="produto-preco">
             <span class="preco-label">A partir de</span>
             <span class="preco-valor" id="preco-20l">R$ --,--</span>
+            <!-- Input Admin -->
+            <div class="admin-price-input">
+              <label for="input-20l">Preço (R$):</label>
+              <input type="number" id="input-20l" step="0.01" min="0" placeholder="0.00">
+            </div>
           </div>
-          <a href="#pedido" class="btn btn-primary btn-full" aria-label="Selecionar Galão de 20 Litros">Pedir Agora</a>
+          <a href="#pedido" class="btn btn-primary btn-full customer-only-nav">Pedir Agora</a>
         </div>
 
         <div class="produto-card reveal">
@@ -167,31 +212,28 @@
             <img src="assets/jugs_requinte_v2.png" alt="Galão 10 Litros Requinte" class="produto-real-img remove-bg" />
           </div>
           <h3 class="produto-nome">Galão 10 Litros</h3>
-          <p class="produto-desc">Perfeito para espaços menores, consultórios, pequenos comércios e uso doméstico com menor consumo.</p>
+          <p class="produto-desc">Perfeito para espaços menores, consultórios, pequenos comércios e uso doméstico com
+            menor consumo.</p>
           <div class="produto-preco">
             <span class="preco-label">A partir de</span>
             <span class="preco-valor" id="preco-10l">R$ --,--</span>
+            <!-- Input Admin -->
+            <div class="admin-price-input">
+              <label for="input-10l">Preço (R$):</label>
+              <input type="number" id="input-10l" step="0.01" min="0" placeholder="0.00">
+            </div>
           </div>
-          <a href="#pedido" class="btn btn-outline btn-full" aria-label="Selecionar Galão de 10 Litros">Pedir Agora</a>
+          <a href="#pedido" class="btn btn-outline btn-full customer-only-nav">Pedir Agora</a>
         </div>
 
       </div>
 
-      <!-- Painel de edição de preços -->
-      <div class="preco-editor" id="preco-editor" role="region" aria-labelledby="preco-editor-title">
-        <h3 id="preco-editor-title"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Atualizar Preços</h3>
-        <div class="preco-inputs">
-          <div class="preco-input-group">
-            <label for="input-20l">Galão 20L (R$)</label>
-            <input type="number" id="input-20l" placeholder="Ex: 12.00" step="0.01" min="0" aria-label="Preço do galão de 20 litros em reais" />
-          </div>
-          <div class="preco-input-group">
-            <label for="input-10l">Galão 10L (R$)</label>
-            <input type="number" id="input-10l" placeholder="Ex: 8.00" step="0.01" min="0" aria-label="Preço do galão de 10 litros em reais" />
-          </div>
-          <button class="btn btn-primary" id="btn-salvar-precos" aria-label="Salvar preços dos galões">Salvar Preços</button>
-        </div>
-        <p class="preco-hint">Os preços são salvos no navegador e ficam visíveis para os clientes.</p>
+      <!-- Botão salvar unificado para admin -->
+      <div class="preco-editor-admin-only">
+        <button class="btn btn-primary btn-lg" id="btn-salvar-precos">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Novos Preços
+        </button>
+        <p class="preco-hint">Os preços alterados acima serão aplicados em todo o site.</p>
       </div>
     </div>
   </section>
@@ -201,20 +243,21 @@
     <div class="container">
       <div class="section-header reveal">
         <h2 class="section-title">Rotas do <span class="highlight">Dia</span></h2>
-        <p class="section-subtitle">Confira os dias de entrega na sua região. Curitiba e região metropolitana.</p>
+        <p class="section-subtitle">
+          <span class="customer-subtitle">Confira os dias de entrega na sua região. Curitiba e região metropolitana.</span>
+          <span class="admin-subtitle">Atualize suas rotas para os clientes.</span>
+        </p>
       </div>
 
       <div class="rotas-semana reveal" id="rotas-semana">
         <!-- Gerado pelo JavaScript -->
       </div>
 
-      <div class="rotas-editor" id="rotas-editor" role="region" aria-labelledby="rotas-editor-title">
-        <h3 id="rotas-editor-title"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Gerenciar Rotas</h3>
-        <div class="rotas-editor-grid" id="rotas-editor-grid">
-          <!-- Gerado pelo JavaScript -->
-        </div>
-        <button class="btn btn-primary" id="btn-salvar-rotas" aria-label="Salvar alterações nas rotas de entrega">Salvar Rotas</button>
-        <p class="preco-hint">As rotas são salvas no navegador e ficam visíveis para os clientes.</p>
+      <div class="rotas-editor-admin-only">
+        <button class="btn btn-primary btn-lg" id="btn-salvar-rotas">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Novas Rotas
+        </button>
+        <p class="preco-hint">As rotas alteradas nos campos acima serão salvas permanentemente.</p>
       </div>
     </div>
   </section>
@@ -223,46 +266,109 @@
   <section class="caminhoes" id="caminhoes">
     <div class="container">
       <div class="section-header reveal">
-        <h2 class="section-title">Nossa <span class="highlight">Frota</span></h2>
-        <p class="section-subtitle">Dois caminhões dedicados exclusivamente à entrega de água mineral em Curitiba.</p>
+        <h2 class="section-title">
+          <span class="customer-title">Nossa <span class="highlight">Frota</span></span>
+          <span class="admin-title">Editar <span class="highlight">Imagem</span></span>
+        </h2>
+        <p class="section-subtitle">
+          <span class="customer-subtitle">Dois caminhões dedicados exclusivamente à entrega de água mineral em Curitiba.</span>
+          <span class="admin-subtitle">Área para mudar a imagem da sua frota.</span>
+        </p>
       </div>
       <div class="caminhoes-grid">
 
         <div class="caminhao-card reveal">
           <div class="caminhao-img-wrapper">
-            <img src="assets/truck1_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega norte de Curitiba" class="caminhao-foto" loading="lazy" />
+            <img src="assets/truck1_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega norte de Curitiba"
+              class="caminhao-foto" loading="lazy" />
           </div>
           <div class="caminhao-info">
             <h3>Caminhão 1</h3>
+            <div class="admin-frota-input">
+              <label for="input-truck1">Link da Foto:</label>
+              <input type="text" id="input-truck1" placeholder="assets/novo-truck.jpg">
+              <div class="upload-area">
+                <span>ou</span>
+                <label for="file-truck1" class="btn btn-outline btn-sm">
+                  <i class="fa-solid fa-upload"></i> Subir da Galeria
+                </label>
+                <input type="file" id="file-truck1" accept="image/*" class="sr-only file-upload-input" data-truck="t1">
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="caminhao-card reveal">
           <div class="caminhao-img-wrapper">
-            <img src="assets/truck2_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega sul de Curitiba" class="caminhao-foto" loading="lazy" />
+            <img src="assets/truck2_novo.jpg" alt="Caminhão da Rei da Água em rota de entrega sul de Curitiba"
+              class="caminhao-foto" loading="lazy" />
           </div>
           <div class="caminhao-info">
             <h3>Caminhão 2</h3>
+            <div class="admin-frota-input">
+              <label for="input-truck2">Link da Foto:</label>
+              <input type="text" id="input-truck2" placeholder="assets/novo-truck.jpg">
+              <div class="upload-area">
+                <span>ou</span>
+                <label for="file-truck2" class="btn btn-outline btn-sm">
+                  <i class="fa-solid fa-upload"></i> Subir da Galeria
+                </label>
+                <input type="file" id="file-truck2" accept="image/*" class="sr-only file-upload-input" data-truck="t2">
+              </div>
+            </div>
           </div>
         </div>
 
       </div>
 
-      <!-- Painel de edição da frota -->
-      <div class="frota-editor" id="frota-editor" role="region" aria-labelledby="frota-editor-title">
-        <h3 id="frota-editor-title"><i class="fa-solid fa-camera" aria-hidden="true"></i> Atualizar Fotos da Frota</h3>
-        <div class="frota-inputs">
-          <div class="frota-input-group">
-            <label for="input-truck1">URL Foto Caminhão 1</label>
-            <input type="text" id="input-truck1" placeholder="Link da imagem (Ex: assets/novo-truck.jpg)" />
-          </div>
-          <div class="frota-input-group">
-            <label for="input-truck2">URL Foto Caminhão 2</label>
-            <input type="text" id="input-truck2" placeholder="Link da imagem" />
-          </div>
-          <button class="btn btn-primary" id="btn-salvar-frota">Salvar Fotos</button>
+      <!-- Botão salvar unificado para frota -->
+      <div class="frota-editor-admin-only">
+        <button class="btn btn-primary btn-lg" id="btn-salvar-frota">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Novas Fotos
+        </button>
+        <p class="preco-hint">As fotos alteradas nos campos acima serão salvas e exibidas no site.</p>
+      </div>
+
+      <!-- Painel de pedidos recebidos -->
+      <div class="pedidos-editor" id="pedidos-editor" role="region" aria-labelledby="pedidos-editor-title">
+        <h3 id="pedidos-editor-title"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i> Pedidos Recentes</h3>
+        <div class="pedidos-container" id="pedidos-lista">
+          <!-- Gerado pelo JavaScript -->
+          <p class="preco-hint">Nenhum pedido registrado ainda.</p>
         </div>
-        <p class="preco-hint">Insira o caminho da imagem ou um link da internet. As fotos são salvas no seu navegador.</p>
+        <div class="pedidos-footer">
+          <button class="btn btn-outline btn-sm" id="btn-limpar-pedidos">Histórico</button>
+        </div>
+      </div>
+
+      <!-- Painel de relatórios de clientes -->
+      <div class="relatorios-editor" id="relatorios-editor" role="region" aria-labelledby="relatorios-editor-title">
+        <h3 id="relatorios-editor-title"><i class="fa-solid fa-users" aria-hidden="true"></i> Ranking de Clientes & Pendências</h3>
+        <div id="relatorios-lista">
+          <!-- Gerado pelo JavaScript -->
+        </div>
+      </div>
+
+      <!-- Painel de configurações -->
+      <div class="settings-editor" id="settings-editor" role="region" aria-labelledby="settings-editor-title">
+        <h3 id="settings-editor-title"><i class="fa-solid fa-gear" aria-hidden="true"></i> Configurações do Site</h3>
+        <div class="settings-grid">
+          <div class="settings-item">
+            <label for="input-whatsapp">Número WhatsApp (com DDD)</label>
+            <input type="text" id="input-whatsapp" placeholder="Ex: 5541985231501" />
+          </div>
+          <div class="settings-item">
+            <label for="input-insta">Instagram (apenas o @)</label>
+            <input type="text" id="input-insta" placeholder="Ex: reidaaguaa" />
+          </div>
+          <div class="settings-item">
+            <label for="input-senha-nova">Nova Senha Administrativa</label>
+            <input type="text" id="input-senha-nova" placeholder="Mínimo 4 caracteres" />
+          </div>
+        </div>
+        <div class="settings-footer">
+          <button class="btn btn-primary" id="btn-salvar-settings">Salvar Configurações</button>
+        </div>
       </div>
     </div>
   </section>
@@ -273,7 +379,8 @@
     <div class="container">
       <div class="section-header reveal">
         <h2 class="section-title">Fazer <span class="highlight">Pedido</span></h2>
-        <p class="section-subtitle">Preencha o formulário abaixo e seu pedido será enviado diretamente pelo WhatsApp.</p>
+        <p class="section-subtitle">Preencha o formulário abaixo e seu pedido será enviado diretamente pelo WhatsApp.
+        </p>
       </div>
 
       <div class="pedido-wrapper reveal">
@@ -310,6 +417,21 @@
           </div>
 
           <div class="form-group">
+            <label for="pagamento">Forma de Pagamento</label>
+            <select id="pagamento">
+              <option value="pix">Pix</option>
+              <option value="dinheiro">Dinheiro</option>
+              <option value="cartão">Cartão</option>
+              <option value="boleto">Boleto</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="telefone">Telefone</label>
+            <input type="tel" id="telefone" placeholder="(00) 00000-0000" />
+          </div>
+
+          <div class="form-group">
             <label for="obs">Observações</label>
             <textarea id="obs" rows="3" placeholder="Alguma informação adicional para a entrega..."></textarea>
           </div>
@@ -318,7 +440,8 @@
             <h3 id="resumo-title">Resumo do Pedido</h3>
             <div class="resumo-linha"><span>Galões 20L:</span><span id="res-20l" aria-live="polite">0 un.</span></div>
             <div class="resumo-linha"><span>Galões 10L:</span><span id="res-10l" aria-live="polite">0 un.</span></div>
-            <div class="resumo-linha resumo-total"><span>Total estimado:</span><span id="res-total" aria-live="polite">R$ 0,00</span></div>
+            <div class="resumo-linha resumo-total"><span>Total estimado:</span><span id="res-total"
+                aria-live="polite">R$ 0,00</span></div>
           </div>
 
           <button type="submit" class="btn btn-whatsapp btn-full btn-lg">
@@ -336,7 +459,8 @@
           <div class="info-card">
             <i class="fa-solid fa-circle-info"></i>
             <h4>Como Funciona</h4>
-            <p>Preencha o formulário, clique em enviar e seu pedido chegará direto no nosso WhatsApp. Entraremos em contato para confirmar.</p>
+            <p>Preencha o formulário, clique em enviar e seu pedido chegará direto no nosso WhatsApp. Entraremos em
+              contato para confirmar.</p>
           </div>
           <div class="info-card">
             <i class="fa-solid fa-rotate"></i>
@@ -353,21 +477,22 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title section-title-white">Fale <span class="highlight-light">Conosco</span></h2>
-        <p class="section-subtitle section-subtitle-white">Estamos prontos para atender você. Entre em contato pelos nossos canais.</p>
+        <p class="section-subtitle section-subtitle-white">Estamos prontos para atender você. Entre em contato pelo
+          nosso whatsapp.</p>
       </div>
       <div class="contato-grid">
 
-        <a href="https://wa.me/5541985231501" target="_blank" class="contato-card">
+        <a href="https://wa.me/5541985231501" target="_blank" class="contato-card link-wpp-href">
           <div class="contato-icon contato-icon-wpp"><i class="fa-brands fa-whatsapp"></i></div>
           <h3>WhatsApp</h3>
-          <p>(41) 98523-1501</p>
+          <p class="link-wpp-text">(41) 98523-1501</p>
           <span class="contato-link">Enviar mensagem →</span>
         </a>
 
-        <a href="https://instagram.com/reidaaguaa" target="_blank" class="contato-card">
+        <a href="https://instagram.com/reidaaguaa" target="_blank" class="contato-card link-insta-href">
           <div class="contato-icon contato-icon-insta"><i class="fa-brands fa-instagram"></i></div>
           <h3>Instagram</h3>
-          <p>@reidaaguaa</p>
+          <p class="link-insta-text">@reidaaguaa</p>
           <span class="contato-link">Ver perfil →</span>
         </a>
 
@@ -390,20 +515,23 @@
       </div>
       <p class="footer-text">Distribuição de galões de água mineral em Curitiba — PR</p>
       <div class="footer-social">
-        <a href="https://wa.me/5541985231501" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://instagram.com/reidaaguaa" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://wa.me/5541985231501" target="_blank" aria-label="WhatsApp"><i
+            class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://instagram.com/reidaaguaa" target="_blank" aria-label="Instagram"><i
+            class="fa-brands fa-instagram"></i></a>
       </div>
       <p class="footer-copy">&copy; <span id="ano"></span> Rei da Água. Todos os direitos reservados.</p>
     </div>
   </footer>
 
   <!-- Botão flutuante WhatsApp -->
-  <a href="https://wa.me/5541985231501" target="_blank" class="whatsapp-float" aria-label="WhatsApp">
+  <a href="https://wa.me/5541985231501" target="_blank" class="whatsapp-float link-wpp-href" aria-label="WhatsApp">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
   <!-- Botão de Login Administrativo (Discreto no rodapé) -->
-  <button class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário" aria-label="Acessar área administrativa do proprietário">
+  <button class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário"
+    aria-label="Acessar área administrativa do proprietário">
     <i class="fa-solid fa-lock" aria-hidden="true"></i>
   </button>
 
@@ -415,12 +543,28 @@
       <label for="input-senha" class="sr-only">Senha de acesso administrativo</label>
       <input type="password" id="input-senha" placeholder="Senha..." autocomplete="current-password" />
       <div class="modal-buttons">
-        <button class="btn btn-outline" id="btn-cancelar-senha" aria-label="Cancelar acesso administrativo">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirmar-senha" aria-label="Confirmar senha e entrar na área administrativa">Entrar</button>
+        <button class="btn btn-outline" id="btn-cancelar-senha"
+          aria-label="Cancelar acesso administrativo">Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirmar-senha"
+          aria-label="Confirmar senha e entrar na área administrativa">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes do Cliente (Histórico) -->
+  <div class="modal-overlay" id="modal-detalhes-cliente" role="dialog" aria-modal="true">
+    <div class="modal-content modal-large">
+      <h2 id="detalhes-cliente-titulo">Histórico de Pedidos</h2>
+      <div id="detalhes-cliente-corpo" class="detalhes-scroll">
+        <!-- Detalhes serão inseridos via JS -->
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-primary" id="btn-fechar-detalhes">Fechar Histórico</button>
       </div>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
+
 </html>
