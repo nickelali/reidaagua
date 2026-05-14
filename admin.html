@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo — Rei da Água</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --azul: #005fa3;
+      --azul-dk: #004880;
+      --azul-lt: #e0f2fe;
+      --branco: #ffffff;
+      --cinza-bg: #f8fafc;
+      --texto: #1e293b;
+      --texto-lt: #64748b;
+      --borda: #e2e8f0;
+      --sucesso: #10b981;
+      --alerta: #f59e0b;
+      --erro: #ef4444;
+      --sombra: 0 4px 12px rgba(0,0,0,0.05);
+      --sidebar-width: 260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; background: var(--cinza-bg); color: var(--texto); display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--branco);
+      border-right: 1px solid var(--borda);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 2rem;
+      border-bottom: 1px solid var(--borda);
+      text-align: center;
+    }
+
+    .sidebar-logo { max-height: 40px; margin-bottom: 0.5rem; }
+
+    .nav-menu { flex: 1; padding: 1.5rem 1rem; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      color: var(--texto-lt);
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+    .nav-item:hover { background: var(--azul-lt); color: var(--azul); }
+    .nav-item.active { background: var(--azul); color: var(--branco); }
+
+    .sidebar-footer { padding: 1rem; border-top: 1px solid var(--borda); }
+    .logout-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .title-group h1 { font-family: 'Montserrat', sans-serif; font-size: 1.75rem; }
+    .title-group p { color: var(--texto-lt); font-size: 0.9rem; }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--branco);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--sombra);
+      border-left: 4px solid var(--azul);
+    }
+    .stat-label { font-size: 0.85rem; color: var(--texto-lt); font-weight: 600; margin-bottom: 0.5rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; font-family: 'Montserrat', sans-serif; }
+
+    /* Section Content */
+    .section-card {
+      background: var(--branco);
+      border-radius: 12px;
+      box-shadow: var(--sombra);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th { text-align: left; padding: 1rem; border-bottom: 2px solid var(--borda); color: var(--texto-lt); font-size: 0.85rem; }
+    td { padding: 1rem; border-bottom: 1px solid var(--borda); font-size: 0.9rem; }
+
+    .badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-delivered { background: #d1fae5; color: #065f46; }
+
+    /* Modal Placeholder */
+    #loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--branco); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main-content { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="fa-3x"><i class="fas fa-circle-notch fa-spin color-azul"></i></div>
+    <p>Autenticando...</p>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/logo.jpg" alt="Logo" class="sidebar-logo">
+      <h3>Painel Admin</h3>
+    </div>
+    <nav class="nav-menu">
+      <a href="#" class="nav-item active" data-section="dashboard">
+        <i class="fas fa-chart-line"></i> Dashboard
+      </a>
+      <a href="#" class="nav-item" data-section="orders">
+        <i class="fas fa-shopping-cart"></i> Pedidos
+      </a>
+      <a href="#" class="nav-item" data-section="customers">
+        <i class="fas fa-users"></i> Clientes
+      </a>
+      <a href="#" class="nav-item" data-section="products">
+        <i class="fas fa-tags"></i> Produtos
+      </a>
+      <a href="#" class="nav-item" data-section="routes">
+        <i class="fas fa-route"></i> Rotas
+      </a>
+      <a href="#" class="nav-item" data-section="drivers">
+        <i class="fas fa-truck-pickup"></i> Entregadores
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Sair do Painel
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="header">
+      <div class="title-group">
+        <h1 id="page-title">Dashboard Operacional</h1>
+        <p id="page-subtitle">Bem-vindo, <span id="user-name">Carregando...</span></p>
+      </div>
+      <div class="header-actions">
+        <button class="nav-item" style="border:none; cursor:pointer;" onclick="location.reload()">
+          <i class="fas fa-sync-alt"></i> Atualizar
+        </button>
+      </div>
+    </header>
+
+    </div>
+
+    </div>
+
+    </div>
+
+    <div id="routes-section" style="display: none;">
+      <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3>Configuração de Rotas</h3>
+          <button id="btn-add-route" class="nav-item" style="background: var(--azul); color: white; border: none; cursor: pointer;">
+            <i class="fas fa-plus"></i> Nova Rota
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>NOME DA ROTA</th>
+                <th>BAIRROS ATENDIDOS</th>
+                <th>DIAS DA SEMANA</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="routes-table-body">
+              <tr><td colspan="4" style="text-align:center; padding: 2rem;">Carregando rotas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Adicionar Rota -->
+    </div>
+
+    <div id="drivers-section" style="display: none;">
+      <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3>Equipe de Entregadores</h3>
+          <button id="btn-add-driver" class="nav-item" style="background: var(--azul); color: white; border: none; cursor: pointer;">
+            <i class="fas fa-user-plus"></i> Novo Entregador
+          </button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>NOME</th>
+                <th>ROTA ATUAL</th>
+                <th>TELEFONE</th>
+                <th>STATUS</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-table-body">
+              <tr><td colspan="5" style="text-align:center; padding: 2rem;">Carregando equipe...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Novo Entregador -->
+    <div id="modal-driver" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+      <div class="section-card" style="width: 90%; max-width: 450px;">
+        <h3>Cadastrar Entregador</h3>
+        <div style="margin-top:1rem;">
+          <div style="display:grid; grid-template-columns: 1fr; gap: 10px;">
+            <input type="text" id="driver-name" class="nav-item" style="width:100%; border:1px solid var(--borda);" placeholder="Nome Completo">
+            <input type="email" id="driver-email" class="nav-item" style="width:100%; border:1px solid var(--borda);" placeholder="E-mail de Login">
+            <input type="password" id="driver-pass" class="nav-item" style="width:100%; border:1px solid var(--borda);" placeholder="Senha (min. 8 caracteres)">
+            <input type="text" id="driver-phone" class="nav-item" style="width:100%; border:1px solid var(--borda);" placeholder="Telefone (WhatsApp)">
+            <select id="driver-route" class="nav-item" style="width:100%; border:1px solid var(--borda); background:white;">
+              <option value="">Sem Rota Atribuída</option>
+              <!-- Populado via JS -->
+            </select>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:1.5rem;">
+            <button onclick="document.getElementById('modal-driver').style.display='none'" class="nav-item" style="flex:1; border:none; background:#f1f5f9; color:var(--texto); cursor:pointer;">Cancelar</button>
+            <button id="btn-save-driver" class="nav-item" style="flex:1; border:none; background:var(--sucesso); color:white; cursor:pointer;">Cadastrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Histórico de Cliente -->
+    <div id="modal-history" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+      <div class="section-card" style="width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 1rem;">
+          <h3 id="history-modal-title">Histórico de Pedidos</h3>
+          <button onclick="document.getElementById('modal-history').style.display='none'" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">&times;</button>
+        </div>
+        <div id="history-content">
+          <!-- Populado via JS -->
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-section" style="display: none;">
+      <div class="section-card">
+        <h3>Configurações da Loja</h3>
+        <div style="max-width: 500px; margin-top: 1rem;">
+          <div style="margin-bottom: 1rem;">
+            <label style="display:block; margin-bottom: 0.5rem; font-weight: 600;">WhatsApp (apenas números)</label>
+            <input type="text" id="set-whatsapp" class="nav-item" style="width: 100%; border: 1px solid var(--borda); background: white; color: var(--texto);" placeholder="Ex: 5541985231501">
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display:block; margin-bottom: 0.5rem; font-weight: 600;">Instagram (username)</label>
+            <input type="text" id="set-instagram" class="nav-item" style="width: 100%; border: 1px solid var(--borda); background: white; color: var(--texto);" placeholder="Ex: reidaaguaa">
+          </div>
+          <button id="save-settings-btn" class="nav-item" style="background: var(--sucesso); color: white; border: none; cursor: pointer; width: 100%; justify-content: center;">
+            <i class="fas fa-save"></i> Salvar Configurações
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outras seções serão populadas via JS -->
+  </main>
+
+  <script src="js/config.js"></script>
+  <script type="module">
+    import { requireAuth, logout } from './js/auth.js';
+    import { listOrders } from './js/orders.js';
+    import { getProducts, updateProduct, getSettings, updateSettings } from './js/settings.js';
+    import { listCustomers, getCustomerOrders } from './js/customers.js';
+    import { listRoutes, createRoute, updateRoute } from './js/routes.js';
+    import { listDrivers, createDriver, toggleUserStatus } from './js/profiles.js';
+
+    let currentEditingRouteId = null;
+
+    async function init() {
+      const auth = await requireAuth(['admin']);
+      if (!auth) return;
+
+      document.getElementById('loading-overlay').style.display = 'none';
+      document.getElementById('user-name').textContent = auth.profile.full_name;
+
+      const navItems = document.querySelectorAll('.nav-item[data-section]');
+      const sections = ['dashboard', 'products', 'settings', 'orders', 'customers', 'routes'];
+      
+      navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = item.getAttribute('data-section');
+          
+          navItems.forEach(n => n.classList.remove('active'));
+          item.classList.add('active');
+
+          sections.forEach(s => {
+            const el = document.getElementById(`${s}-section`);
+            if (el) el.style.display = s === target ? 'block' : 'none';
+          });
+
+          if (target === 'dashboard') loadDashboard();
+          if (target === 'products') loadProducts();
+          if (target === 'settings') loadSettings();
+          if (target === 'customers') loadCustomers();
+          if (target === 'routes') loadRoutes();
+          if (target === 'drivers') loadDriversList();
+        });
+      });
+
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if(confirm('Deseja realmente sair?')) await logout();
+      });
+
+      document.getElementById('save-settings-btn').addEventListener('click', handleSaveSettings);
+
+      document.getElementById('customer-search-input').addEventListener('input', (e) => {
+        loadCustomers(e.target.value);
+      });
+
+      // Eventos de Rotas
+      document.getElementById('btn-add-route').addEventListener('click', () => {
+        currentEditingRouteId = null;
+        document.getElementById('route-modal-title').textContent = 'Nova Rota';
+        document.getElementById('route-name').value = '';
+        document.getElementById('route-districts').value = '';
+        document.querySelectorAll('#route-days-grid input').forEach(i => i.checked = false);
+        document.getElementById('modal-route').style.display = 'flex';
+      });
+
+      document.getElementById('btn-save-route').addEventListener('click', handleSaveRoute);
+
+      // Eventos de Entregadores
+      document.getElementById('btn-add-driver').addEventListener('click', async () => {
+        const routes = await listRoutes(true);
+        const select = document.getElementById('driver-route');
+        select.innerHTML = '<option value="">Sem Rota Atribuída</option>' + 
+          routes.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        
+        document.getElementById('modal-driver').style.display = 'flex';
+      });
+
+      document.getElementById('btn-save-driver').addEventListener('click', handleSaveDriver);
+
+      loadDashboard();
+    }
+
+    async function loadDashboard() {
+      try {
+        const { data: orders } = await listOrders({}, 0, 10);
+        const tbody = document.getElementById('recent-orders-body');
+        if (!orders || orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum pedido encontrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = orders.map(order => `
+          <tr>
+            <td><strong>${order.customers?.name || 'Cliente Avulso'}</strong></td>
+            <td>${order.customers?.district || '-'}</td>
+            <td>R$ ${order.total.toFixed(2)}</td>
+            <td><span class="badge badge-${order.status}">${order.status}</span></td>
+            <td>${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+          </tr>
+        `).join('');
+        document.getElementById('stats-orders-today').textContent = orders.length;
+        const delivered = orders.filter(o => o.status === 'delivered').length;
+        document.getElementById('stats-delivered-today').textContent = delivered;
+        const revenue = orders.reduce((acc, o) => acc + o.total, 0);
+        document.getElementById('stats-revenue-today').textContent = `R$ ${revenue.toFixed(2)}`;
+      } catch (err) { console.error(err); }
+    }
+
+    async function loadCustomers(search = '') {
+      const tbody = document.getElementById('customers-table-body');
+      try {
+        const { data } = await listCustomers(search);
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum cliente encontrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.map(c => `
+          <tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.district}<br><small style="color:var(--texto-lt)">${c.address}</small></td>
+            <td>${c.phone}</td>
+            <td>
+              <button class="nav-item" style="padding: 5px 10px; border:none; background:var(--azul-lt); color:var(--azul); cursor:pointer;" 
+                      onclick="viewCustomerHistory('${c.id}', '${c.name}')">
+                <i class="fas fa-history"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    window.viewCustomerHistory = async (id, name) => {
+      const modal = document.getElementById('modal-history');
+      const content = document.getElementById('history-content');
+      document.getElementById('history-modal-title').textContent = `Histórico: ${name}`;
+      modal.style.display = 'flex';
+      content.innerHTML = '<p style="text-align:center; padding:2rem;">Carregando pedidos...</p>';
+
+      try {
+        const orders = await getCustomerOrders(id);
+        if (orders.length === 0) {
+          content.innerHTML = '<p style="text-align:center; padding:2rem;">Este cliente ainda não fez pedidos.</p>';
+          return;
+        }
+        content.innerHTML = orders.map(o => `
+          <div style="padding:15px; border:1px solid var(--borda); border-radius:8px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <strong>Data: ${new Date(o.created_at).toLocaleDateString()}</strong>
+              <span class="badge badge-${o.status}">${o.status}</span>
+            </div>
+            <div style="font-size:0.9rem;">
+              ${o.order_items.map(i => `${i.quantity}x ${i.products.name}`).join(', ')}
+            </div>
+            <div style="margin-top:10px; font-weight:700; color:var(--azul);">
+              Total: R$ ${o.total.toFixed(2)}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        content.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar histórico.</p>';
+      }
+    };
+
+    async function loadProducts() {
+      const list = document.getElementById('products-list');
+      try {
+        const products = await getProducts();
+        list.innerHTML = products.map(p => `
+          <div class="stat-card">
+            <p class="stat-label">${p.name}</p>
+            <div style="display:flex; gap: 10px; align-items:center;">
+              <span style="font-size: 1.2rem; font-weight:700;">R$</span>
+              <input type="number" step="0.01" value="${p.price}" id="price-${p.id}" 
+                     class="nav-item" style="width:100px; border:1px solid var(--borda); background:white; color:var(--texto); font-size:1.2rem;">
+              <button class="nav-item" style="border:none; cursor:pointer; background:var(--azul); color:white;" onclick="handleSavePrice('${p.id}')">
+                <i class="fas fa-save"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    window.handleSavePrice = async (id) => {
+      const val = document.getElementById(`price-${id}`).value;
+      try {
+        await updateProduct(id, { price: parseFloat(val) });
+        alert('Preço atualizado!');
+      } catch (err) { alert('Erro ao salvar.'); }
+    };
+
+    async function loadRoutes() {
+      const tbody = document.getElementById('routes-table-body');
+      const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      try {
+        const data = await listRoutes(false);
+        if (!data || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhuma rota cadastrada.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.map(r => `
+          <tr>
+            <td><strong>${r.name}</strong> ${!r.active ? '<span style="color:red">(Inativa)</span>' : ''}</td>
+            <td>${r.districts.join(', ')}</td>
+            <td>${r.days_of_week.map(d => dias[d]).join(', ')}</td>
+            <td>
+              <button class="nav-item" style="padding: 5px 10px; border:none; background:#f1f5f9; color:var(--texto); cursor:pointer;" 
+                      onclick="editRoute('${r.id}', '${r.name}', '${r.districts.join(', ')}', [${r.days_of_week}])">
+                <i class="fas fa-edit"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    window.editRoute = (id, name, districts, days) => {
+      currentEditingRouteId = id;
+      document.getElementById('route-modal-title').textContent = 'Editar Rota';
+      document.getElementById('route-name').value = name;
+      document.getElementById('route-districts').value = districts;
+      document.querySelectorAll('#route-days-grid input').forEach(i => {
+        i.checked = days.includes(parseInt(i.value));
+      });
+      document.getElementById('modal-route').style.display = 'flex';
+    };
+
+    async function handleSaveRoute() {
+      const name = document.getElementById('route-name').value;
+      const districts = document.getElementById('route-districts').value.split(',').map(d => d.trim()).filter(Boolean);
+      const days = Array.from(document.querySelectorAll('#route-days-grid input:checked')).map(i => parseInt(i.value));
+
+      if (!name || districts.length === 0 || days.length === 0) {
+        alert('Preencha todos os campos!');
+        return;
+      }
+
+      try {
+        if (currentEditingRouteId) {
+          await updateRoute(currentEditingRouteId, { name, districts, days_of_week: days });
+        } else {
+          await createRoute({ name, districts, days_of_week: days });
+        }
+        document.getElementById('modal-route').style.display = 'none';
+        loadRoutes();
+        alert('Rota salva com sucesso!');
+      } catch (err) {
+        alert('Erro ao salvar rota: ' + err.message);
+      }
+    }
+
+    async function loadDriversList() {
+      const tbody = document.getElementById('drivers-table-body');
+      try {
+        const data = await listDrivers();
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum entregador cadastrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.map(d => `
+          <tr>
+            <td><strong>${d.full_name}</strong></td>
+            <td>${d.routes?.name || '<span style="color:var(--texto-lt)">-</span>'}</td>
+            <td>${d.phone || '-'}</td>
+            <td><span class="badge ${d.active ? 'badge-delivered' : 'badge-pending'}">${d.active ? 'ATIVO' : 'INATIVO'}</span></td>
+            <td>
+              <button class="nav-item" style="padding: 5px 10px; border:none; background:#f1f5f9; color:var(--texto); cursor:pointer;" onclick="handleToggleDriver('${d.id}', ${d.active})">
+                <i class="fas fa-power-off"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+
+    async function handleSaveDriver() {
+      const data = {
+        full_name: document.getElementById('driver-name').value,
+        email:     document.getElementById('driver-email').value,
+        password:  document.getElementById('driver-pass').value,
+        phone:     document.getElementById('driver-phone').value,
+        route_id:  document.getElementById('driver-route').value || null
+      };
+
+      if (!data.full_name || !data.email || !data.password) {
+        alert('Preencha os campos obrigatórios!');
+        return;
+      }
+
+      try {
+        await createDriver(data);
+        alert('Entregador cadastrado com sucesso!');
+        document.getElementById('modal-driver').style.display = 'none';
+        loadDriversList();
+      } catch (err) {
+        alert('Erro ao cadastrar: ' + err.message);
+      }
+    }
+
+    window.handleToggleDriver = async (id, currentStatus) => {
+      if(!confirm(`Deseja ${currentStatus ? 'desativar' : 'ativar'} este entregador?`)) return;
+      try {
+        await toggleUserStatus(id, !currentStatus);
+        loadDriversList();
+      } catch (err) { alert('Erro ao mudar status.'); }
+    };
+
+    async function loadSettings() {
+      try {
+        const s = await getSettings();
+        document.getElementById('set-whatsapp').value = s.whatsapp || '';
+        document.getElementById('set-instagram').value = s.instagram || '';
+      } catch (err) { console.error(err); }
+    }
+
+    async function handleSaveSettings() {
+      const data = {
+        whatsapp: document.getElementById('set-whatsapp').value.replace(/\D/g,''),
+        instagram: document.getElementById('set-instagram').value.trim()
+      };
+      try {
+        await updateSettings(data);
+        alert('Configurações salvas!');
+      } catch (err) { alert('Erro ao salvar.'); }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entregas — Rei da Água</title>
+  <meta name="theme-color" content="#005fa3">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --azul: #005fa3;
+      --azul-dk: #003d6b;
+      --sucesso: #059669;
+      --texto: #111827;
+      --texto-lt: #4b5563;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --borda: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: var(--texto); padding-bottom: 80px; }
+
+    header {
+      background: var(--azul);
+      color: white;
+      padding: 1.25rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; }
+
+    .container { padding: 1rem; max-width: 600px; margin: 0 auto; }
+
+    /* Cards de Entrega */
+    .delivery-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border: 1px solid var(--borda);
+    }
+
+    .client-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem; display: block; }
+    .address { color: var(--texto-lt); font-size: 0.95rem; line-height: 1.4; margin-bottom: 0.75rem; display: block; }
+    
+    .order-items {
+      background: #f9fafb;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .item-row { display: flex; justify-content: space-between; margin-bottom: 0.25rem; }
+    .item-row:last-child { margin-bottom: 0; }
+
+    .btn-group { display: flex; gap: 0.5rem; }
+    
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: opacity 0.2s;
+    }
+    .btn:active { opacity: 0.8; }
+
+    .btn-success { background: var(--sucesso); color: white; }
+    .btn-map { background: #e5e7eb; color: var(--texto); }
+    .btn-phone { background: var(--azul); color: white; flex: 0 0 56px; }
+
+    .status-done {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      display: none;
+    }
+
+    .delivery-card.delivered .btn-group { display: none; }
+    .delivery-card.delivered .status-done { display: block; }
+
+    /* Navegação Inferior */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      display: flex;
+      border-top: 1px solid var(--borda);
+      padding: 0.5rem 0;
+    }
+
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      color: var(--texto-lt);
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .nav-tab.active { color: var(--azul); }
+    .nav-tab i { font-size: 1.25rem; }
+
+    #loading-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: white; z-index: 1000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+    }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--texto-lt); }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <i class="fas fa-circle-notch fa-spin fa-2x" style="color: var(--azul);"></i>
+    <p>Carregando rota...</p>
+  </div>
+
+  <header>
+    <h1>Minhas Entregas</h1>
+    <button id="logout-btn" style="background: none; border: none; color: white; font-size: 1.2rem;">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
+  </header>
+
+  <div class="container" id="delivery-list">
+    <!-- Lista será preenchida via JS -->
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-tab active">
+      <i class="fas fa-truck"></i> Hoje
+    </a>
+    <a href="#" class="nav-tab">
+      <i class="fas fa-history"></i> Histórico
+    </a>
+    <a href="#" class="nav-tab">
+      <i class="fas fa-user"></i> Perfil
+    </a>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script type="module">
+    import { requireAuth, logout } from './js/auth.js';
+    import { getTodayDeliveries, confirmDelivery } from './js/driver.js';
+
+    async function init() {
+      const auth = await requireAuth(['driver']);
+      if (!auth) return;
+
+      document.getElementById('loading-overlay').style.display = 'none';
+
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        if(confirm('Deseja sair do aplicativo?')) await logout();
+      });
+
+      renderDeliveries();
+    }
+
+    async function renderDeliveries() {
+      const list = document.getElementById('delivery-list');
+      try {
+        const deliveries = await getTodayDeliveries();
+        
+        if (deliveries.length === 0) {
+          list.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-calendar-check"></i>
+              <p>Nenhuma entrega agendada para hoje!</p>
+            </div>
+          `;
+          return;
+        }
+
+        list.innerHTML = deliveries.map(order => `
+          <div class="delivery-card ${order.status === 'delivered' ? 'delivered' : ''}" id="card-${order.id}">
+            <span class="client-name">${order.customers.name}</span>
+            <span class="address">${order.customers.address}, ${order.customers.district}</span>
+            
+            <div class="order-items">
+              ${order.order_items.map(item => `
+                <div class="item-row">
+                  <span>${item.quantity}x ${item.products.name}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="btn-group">
+              <a href="tel:${order.customers.phone.replace(/\D/g,'')}" class="btn btn-phone">
+                <i class="fas fa-phone"></i>
+              </a>
+              <a href="https://maps.google.com/?q=${encodeURIComponent(order.customers.address + ', ' + order.customers.district)}" target="_blank" class="btn btn-map">
+                <i class="fas fa-map-marker-alt"></i> Mapa
+              </a>
+              <button class="btn btn-success" onclick="handleConfirm('${order.id}')">
+                <i class="fas fa-check"></i> Entregar
+              </button>
+            </div>
+
+            <div class="status-done">
+              <i class="fas fa-check-circle"></i> Entrega Concluída
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        list.innerHTML = `<p style="text-align:center; color:red;">Erro ao carregar entregas.</p>`;
+        console.error(err);
+      }
+    }
+
+    // Expor função para o escopo global (usada no onclick)
+    window.handleConfirm = async (id) => {
+      if(!confirm('Confirmar entrega para este cliente?')) return;
+      
+      try {
+        await confirmDelivery(id);
+        document.getElementById(`card-${id}`).classList.add('delivered');
+        alert('Entrega confirmada com sucesso!');
+      } catch (err) {
+        alert('Erro ao confirmar entrega. Tente novamente.');
+      }
+    };
+
+    init();
+  </script>
+</body>
+</html>

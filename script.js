@@ -2,10 +2,14 @@
    REI DA ÁGUA — JAVASCRIPT
    ============================================= */
 
-// ===== CONFIGURAÇÕES =====
-const CONFIG = {
+import { getSettings, getProducts, subscribeToProductChanges } from './js/settings.js';
+import { createOrder, markWhatsappSent } from './js/orders.js';
+import { createCustomer } from './js/customers.js';
+
+// ===== CONFIGURAÇÕES (Valores Iniciais / Fallback) =====
+let CONFIG = {
   whatsapp: '5541985231501',
-  instagram: 'https://instagram.com/reidaaguaa',
+  instagram: 'reidaaguaa',
   diasSemana: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
   diasAbrev:  ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
 };
@@ -56,7 +60,7 @@ function mostrarToast(msg, tipo = 'success') {
   });
 }
 
-// ===== PERSISTÊNCIA (localStorage) =====
+// ===== PERSISTÊNCIA & INTEGRAÇÃO SUPABASE =====
 function salvarDados() {
   localStorage.setItem('rda_precos', JSON.stringify(precos));
   localStorage.setItem('rda_rotas',  JSON.stringify(rotas));
@@ -65,8 +69,38 @@ function salvarDados() {
   localStorage.setItem('rda_config', JSON.stringify(customConfig));
 }
 
-function carregarDados() {
+async function carregarDados() {
+  // 1. Tenta carregar do Supabase (Prioridade)
   try {
+    const [dbSettings, dbProducts] = await Promise.all([
+      getSettings(),
+      getProducts()
+    ]);
+
+    // Atualizar Configs
+    if (dbSettings.whatsapp) {
+      CONFIG.whatsapp = dbSettings.whatsapp;
+      customConfig.whatsapp = dbSettings.whatsapp;
+    }
+    if (dbSettings.instagram) {
+      CONFIG.instagram = dbSettings.instagram;
+      customConfig.instagram = dbSettings.instagram;
+    }
+
+    // Atualizar Preços
+    const p20 = dbProducts.find(p => p.size_liters === 20);
+    const p10 = dbProducts.find(p => p.size_liters === 10);
+    if (p20) precos.p20 = p20.price;
+    if (p10) precos.p10 = p10.price;
+
+    // Expor produtos globalmente para o formulário de pedido
+    window._appProducts = dbProducts;
+
+    console.log('[RDA] Dados carregados do Supabase');
+  } catch (err) {
+    console.warn('[RDA] Erro ao carregar do Supabase, usando cache local:', err);
+    
+    // Fallback para LocalStorage se Supabase falhar
     const p = localStorage.getItem('rda_precos');
     const r = localStorage.getItem('rda_rotas');
     const f = localStorage.getItem('rda_frota');
@@ -77,9 +111,19 @@ function carregarDados() {
     if (f) frota  = JSON.parse(f);
     if (d) pedidos = JSON.parse(d);
     if (c) customConfig = JSON.parse(c);
-  } catch (e) {
-    console.warn('Erro ao carregar dados salvos:', e);
   }
+
+  // 2. Iniciar Realtime para Preços
+  subscribeToProductChanges((updatedProduct) => {
+    if (updatedProduct.size_liters === 20) precos.p20 = updatedProduct.price;
+    if (updatedProduct.size_liters === 10) precos.p10 = updatedProduct.price;
+    
+    // Atualizar UI da calculadora se ela existir
+    if (typeof atualizarCalculadora === 'function') {
+      atualizarCalculadora();
+    }
+    mostrarToast('Preços atualizados em tempo real!', 'info');
+  });
 }
 
 // ===== NAVBAR =====
@@ -351,18 +395,12 @@ function initPedido() {
     msg += `\n------------------------------------------\n`;
     msg += `_Enviado via reidaagua.com.br_`;
 
-    // Salvar localmente para a área adm
+    // Salvar localmente (fallback)
     const novoPedido = {
       id: Date.now(),
       data: new Date().toLocaleString('pt-BR'),
-      nome,
-      endereco: end,
-      telefone,
-      qtd20,
-      qtd10,
-      total: formatarMoeda(total),
-      status: 'pendente',
-      pagamento: 'pendente'
+      nome, endereco: end, telefone, qtd20, qtd10,
+      total: formatarMoeda(total), status: 'pendente', pagamento: 'pendente'
     };
     pedidos.unshift(novoPedido);
     if (pedidos.length > 50) pedidos.pop();
@@ -370,6 +408,37 @@ function initPedido() {
     renderizarPedidosAdmin();
 
     const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+
+    // Tentar persistir no Supabase (não bloqueia o fluxo se falhar)
+    (async () => {
+      try {
+        // 1. Criar/registrar cliente
+        const customer = await createCustomer({
+          name:     nome,
+          phone:    telefone || 'Site Lead',
+          address:  end,
+          district: end.split(',').pop().trim() || 'Curitiba',
+        });
+
+        // 2. Preparar itens com IDs do banco
+        const items = [];
+        const prod20 = window._appProducts?.find(p => p.size_liters === 20);
+        const prod10 = window._appProducts?.find(p => p.size_liters === 10);
+        if (qtd20 > 0 && prod20) items.push({ product_id: prod20.id, quantity: qtd20 });
+        if (qtd10 > 0 && prod10) items.push({ product_id: prod10.id, quantity: qtd10 });
+
+        if (items.length > 0) {
+          // 3. Criar pedido no Supabase
+          const { order } = await createOrder({ customer_id: customer.id, notes: obs }, items);
+          await markWhatsappSent(order.id);
+          console.info('[RDA] Pedido salvo no Supabase:', order.id);
+        }
+      } catch (err) {
+        // Falha silenciosa — o cliente ainda vai pro WhatsApp
+        console.warn('[RDA] Falha ao persistir pedido no Supabase:', err.message);
+      }
+    })();
+
     window.open(url, '_blank');
   });
 }
@@ -981,7 +1050,30 @@ function abrirWhatsCliente(tel) {
   window.open(`https://wa.me/${link}`, '_blank');
 }
 
-// Adicionar initAdmin na inicialização
-document.addEventListener('DOMContentLoaded', () => {
+// ===== INICIALIZAÇÃO =====
+async function bootstrap() {
+  // Primeiro carrega os dados (Supabase ou Local)
+  await carregarDados();
+  
+  // Depois inicializa as partes da UI
+  initNavbar();
+  initCalculadora();
+  initPrecos();
+  initRotas();
+  initFrota();
+  initPedidos();
   initAdmin();
-});
+
+  // Expor funções necessárias para o HTML (onclick, etc)
+  window.verDetalhesCliente = verDetalhesCliente;
+  window.abrirWhatsCliente = abrirWhatsCliente;
+  window.toggleStatusPedido = typeof toggleStatusPedido !== 'undefined' ? toggleStatusPedido : null;
+  window.togglePagamentoPedido = typeof togglePagamentoPedido !== 'undefined' ? togglePagamentoPedido : null;
+}
+
+// Inicia tudo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  bootstrap();
+}
