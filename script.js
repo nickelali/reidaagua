@@ -140,37 +140,41 @@ function renderizarPrecos() {
 function initPrecos() {
   renderizarPrecos();
 
-    document.getElementById('btn-salvar-precos').addEventListener('click', () => {
-      const v20 = parseFloat(document.getElementById('input-20l').value);
-      const v10 = parseFloat(document.getElementById('input-10l').value);
+  const salvarPrecos = () => {
+    const v20 = parseFloat(document.getElementById('input-20l').value);
+    const v10 = parseFloat(document.getElementById('input-10l').value);
 
-      if (isNaN(v20) && isNaN(v10)) {
-        mostrarToast('Informe pelo menos um preço.', 'error');
-        return;
-      }
+    let alterado = false;
+    if (!isNaN(v20) && v20 >= 0 && v20 !== precos.p20) { precos.p20 = v20; alterado = true; }
+    if (!isNaN(v10) && v10 >= 0 && v10 !== precos.p10) { precos.p10 = v10; alterado = true; }
 
-      if (!isNaN(v20) && v20 >= 0) precos.p20 = v20;
-      if (!isNaN(v10) && v10 >= 0) precos.p10 = v10;
-
+    if (alterado) {
       salvarDados();
       renderizarPrecos();
-      mostrarToast('Preços salvos com sucesso!');
-    });
+      mostrarToast('Preços salvos automaticamente');
+    }
+  };
 
-    // Live Preview de Preços
-    const inputsPreco = ['input-20l', 'input-10l'];
-    inputsPreco.forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        const v20 = parseFloat(document.getElementById('input-20l').value) || precos.p20;
-        const v10 = parseFloat(document.getElementById('input-10l').value) || precos.p10;
-        
-        // Preview temporário (sem salvar)
-        document.getElementById('preco-20l').textContent = formatarMoeda(v20);
-        document.getElementById('preco-10l').textContent = formatarMoeda(v10);
-        atualizarResumoPedido();
-      });
+  document.getElementById('btn-salvar-precos').addEventListener('click', salvarPrecos);
+
+  // Auto-save no blur
+  const inputsPreco = ['input-20l', 'input-10l'];
+  inputsPreco.forEach(id => {
+    const input = document.getElementById(id);
+    
+    input.addEventListener('blur', salvarPrecos);
+    
+    input.addEventListener('input', () => {
+      const v20 = parseFloat(document.getElementById('input-20l').value) || precos.p20;
+      const v10 = parseFloat(document.getElementById('input-10l').value) || precos.p10;
+      
+      // Preview temporário (sem salvar)
+      document.getElementById('preco-20l').textContent = formatarMoeda(v20);
+      document.getElementById('preco-10l').textContent = formatarMoeda(v10);
+      atualizarResumoPedido();
     });
-  }
+  });
+}
 
 // ===== ROTAS =====
 function renderizarRotas() {
@@ -222,16 +226,32 @@ function renderizarRotas() {
 function initRotas() {
   renderizarRotas();
 
-  document.getElementById('btn-salvar-rotas').addEventListener('click', () => {
+  const salvarRotas = () => {
     const inputs = document.querySelectorAll('.input-rota-dinamico');
+    let alterado = false;
     inputs.forEach(input => {
       const idx = parseInt(input.getAttribute('data-idx'));
-      rotas[idx] = input.value.trim();
+      const novoValor = input.value.trim();
+      if (rotas[idx] !== novoValor) {
+        rotas[idx] = novoValor;
+        alterado = true;
+      }
     });
 
-    salvarDados();
-    renderizarRotas();
-    mostrarToast('Rotas atualizadas com sucesso!');
+    if (alterado) {
+      salvarDados();
+      renderizarRotas();
+      mostrarToast('Rotas salvas automaticamente');
+    }
+  };
+
+  document.getElementById('btn-salvar-rotas').addEventListener('click', salvarRotas);
+
+  // Auto-save usando delegação de eventos para os inputs dinâmicos
+  document.getElementById('rotas-semana').addEventListener('focusout', (e) => {
+    if (e.target.classList.contains('input-rota-dinamico')) {
+      salvarRotas();
+    }
   });
 }
 
