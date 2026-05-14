@@ -117,7 +117,7 @@
           </a>
         </div>
       </div>
-      <div class="hero-image-area reveal">
+      <div class="hero-image-area">
         <div class="hero-image-wrapper">
           <!-- <div class="jug-backdrop"></div> -->
           <!-- Imagem Admin (Logo) -->
@@ -529,27 +529,12 @@
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
-  <!-- Botão de Login Administrativo (Discreto no rodapé) -->
-  <button class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário"
+  <!-- Botão de Login Administrativo (Redireciona para o novo painel) -->
+  <a href="login.html" class="admin-login-btn" id="admin-login-btn" title="Área do Proprietário"
     aria-label="Acessar área administrativa do proprietário">
     <i class="fa-solid fa-lock" aria-hidden="true"></i>
-  </button>
+  </a>
 
-  <!-- Modal de Senha -->
-  <div class="modal-overlay" id="modal-senha" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-content">
-      <h2 id="modal-title">Acesso Administrativo</h2>
-      <p>Digite a senha para editar preços e rotas:</p>
-      <label for="input-senha" class="sr-only">Senha de acesso administrativo</label>
-      <input type="password" id="input-senha" placeholder="Senha..." autocomplete="current-password" />
-      <div class="modal-buttons">
-        <button class="btn btn-outline" id="btn-cancelar-senha"
-          aria-label="Cancelar acesso administrativo">Cancelar</button>
-        <button class="btn btn-primary" id="btn-confirmar-senha"
-          aria-label="Confirmar senha e entrar na área administrativa">Entrar</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Modal Detalhes do Cliente (Histórico) -->
   <div class="modal-overlay" id="modal-detalhes-cliente" role="dialog" aria-modal="true">

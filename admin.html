@@ -166,6 +166,9 @@
     <div class="sidebar-header">
       <img src="assets/logo.jpg" alt="Logo" class="sidebar-logo">
       <h3>Painel Admin</h3>
+      <a href="index.html" style="font-size: 0.8rem; color: var(--azul); text-decoration: none; font-weight: 600;">
+        <i class="fas fa-arrow-left"></i> Ir para o site
+      </a>
     </div>
     <nav class="nav-menu">
       <a href="#" class="nav-item active" data-section="dashboard">
@@ -200,19 +203,115 @@
         <h1 id="page-title">Dashboard Operacional</h1>
         <p id="page-subtitle">Bem-vindo, <span id="user-name">Carregando...</span></p>
       </div>
-      <div class="header-actions">
-        <button class="nav-item" style="border:none; cursor:pointer;" onclick="location.reload()">
+      <div class="header-actions" style="display: flex; gap: 10px;">
+        <a href="index.html" class="nav-item" style="text-decoration: none; background: var(--azul-lt); color: var(--azul); padding: 8px 15px;">
+          <i class="fas fa-external-link-alt"></i> Ver Site
+        </a>
+        <button class="nav-item" style="border:none; cursor:pointer; background: #f1f5f9;" onclick="location.reload()">
           <i class="fas fa-sync-alt"></i> Atualizar
         </button>
       </div>
     </header>
 
+    <!-- ===== DASHBOARD ===== -->
+    <div id="dashboard-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">PEDIDOS HOJE</p>
+          <p class="stat-value" id="stats-orders-today">0</p>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--sucesso);">
+          <p class="stat-label">ENTREGAS CONCLUÍDAS</p>
+          <p class="stat-value" id="stats-delivered-today">0</p>
+        </div>
+        <div class="stat-card" style="border-left-color: var(--alerta);">
+          <p class="stat-label">FATURAMENTO PREVISTO</p>
+          <p class="stat-value" id="stats-revenue-today">R$ 0,00</p>
+        </div>
+      </div>
+      <div class="section-card">
+        <h3>Últimos Pedidos</h3>
+        <div class="table-container">
+          <table id="recent-orders-table">
+            <thead>
+              <tr>
+                <th>CLIENTE</th>
+                <th>BAIRRO</th>
+                <th>VALOR</th>
+                <th>STATUS</th>
+                <th>HORÁRIO</th>
+              </tr>
+            </thead>
+            <tbody id="recent-orders-body">
+              <tr><td colspan="5" style="text-align:center; padding: 2rem;">Carregando pedidos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
+    <!-- ===== PRODUTOS ===== -->
+    <div id="products-section" style="display: none;">
+      <div class="section-card">
+        <h3>Gerenciar Preços</h3>
+        <p style="margin-bottom: 1.5rem; color: var(--texto-lt);">Os preços alterados aqui refletem instantaneamente no site.</p>
+        <div id="products-list" class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+          <div style="text-align:center; padding: 2rem;">Carregando produtos...</div>
+        </div>
+      </div>
     </div>
 
+    <!-- ===== CLIENTES ===== -->
+    <div id="customers-section" style="display: none;">
+      <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3>Gestão de Clientes</h3>
+          <input type="text" id="customer-search-input" class="nav-item" style="width: 300px; border: 1px solid var(--borda); background: white; color: var(--texto);" placeholder="Buscar por nome, bairro ou telefone...">
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>NOME</th>
+                <th>BAIRRO / ENDEREÇO</th>
+                <th>TELEFONE</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="customers-table-body">
+              <tr><td colspan="4" style="text-align:center; padding: 2rem;">Carregando clientes...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
+    <!-- ===== MODAL ROTA ===== -->
+    <div id="modal-route" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+      <div class="section-card" style="width: 90%; max-width: 500px;">
+        <h3 id="route-modal-title">Nova Rota</h3>
+        <div style="margin-top:1rem;">
+          <label style="display:block; margin-bottom:0.5rem; font-weight:600;">Nome da Rota</label>
+          <input type="text" id="route-name" class="nav-item" style="width:100%; border:1px solid var(--borda); background:white; color:var(--texto);" placeholder="Ex: Rota Centro">
+          <label style="display:block; margin:1rem 0 0.5rem; font-weight:600;">Bairros (separados por vírgula)</label>
+          <textarea id="route-districts" class="nav-item" style="width:100%; height:80px; border:1px solid var(--borda); background:white; color:var(--texto);" placeholder="Ex: Batel, Centro, Água Verde"></textarea>
+          <label style="display:block; margin:1rem 0 0.5rem; font-weight:600;">Dias da Semana</label>
+          <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px;" id="route-days-grid">
+            <label><input type="checkbox" value="1"> Seg</label>
+            <label><input type="checkbox" value="2"> Ter</label>
+            <label><input type="checkbox" value="3"> Qua</label>
+            <label><input type="checkbox" value="4"> Qui</label>
+            <label><input type="checkbox" value="5"> Sex</label>
+            <label><input type="checkbox" value="6"> Sáb</label>
+            <label><input type="checkbox" value="0"> Dom</label>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:1.5rem;">
+            <button onclick="document.getElementById('modal-route').style.display='none'" class="nav-item" style="flex:1; border:none; background:#f1f5f9; color:var(--texto); cursor:pointer;">Cancelar</button>
+            <button id="btn-save-route" class="nav-item" style="flex:1; border:none; background:var(--sucesso); color:white; cursor:pointer;">Salvar Rota</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="routes-section" style="display: none;">
       <div class="section-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -237,9 +336,6 @@
           </table>
         </div>
       </div>
-    </div>
-
-    <!-- Modal Adicionar Rota -->
     </div>
 
     <div id="drivers-section" style="display: none;">
@@ -339,14 +435,20 @@
     let currentEditingRouteId = null;
 
     async function init() {
-      const auth = await requireAuth(['admin']);
-      if (!auth) return;
+      console.log('[admin] Iniciando init()...');
+      try {
+        console.log('[admin] Verificando autenticação...');
+        const auth = await requireAuth(['admin']);
+        console.log('[admin] Autenticação retornou:', auth ? 'Sucesso' : 'Falha');
+        if (!auth) return;
 
-      document.getElementById('loading-overlay').style.display = 'none';
-      document.getElementById('user-name').textContent = auth.profile.full_name;
+        console.log('[admin] Escondendo overlay e carregando dados...');
+        document.getElementById('loading-overlay').style.display = 'none';
+        document.getElementById('user-name').textContent = auth.profile.full_name;
 
-      const navItems = document.querySelectorAll('.nav-item[data-section]');
-      const sections = ['dashboard', 'products', 'settings', 'orders', 'customers', 'routes'];
+        const navItems = document.querySelectorAll('.nav-item[data-section]');
+        const sections = ['dashboard', 'products', 'settings', 'customers', 'routes', 'drivers'];
+        console.log('[admin] Nav items encontrados:', navItems.length);
       
       navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -405,6 +507,11 @@
       document.getElementById('btn-save-driver').addEventListener('click', handleSaveDriver);
 
       loadDashboard();
+      } catch (err) {
+        console.error('[admin] Erro na inicialização:', err);
+        document.getElementById('loading-overlay').style.display = 'none';
+        alert('Erro ao carregar o painel: ' + err.message);
+      }
     }
 
     async function loadDashboard() {

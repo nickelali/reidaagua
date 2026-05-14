@@ -529,6 +529,7 @@ function initBGRemoval() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         
+        if (img.naturalWidth === 0 || img.naturalHeight === 0) return;
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
         ctx.drawImage(img, 0, 0);
@@ -544,7 +545,9 @@ function initBGRemoval() {
         for (let y = 0; y < height; y++) { stack.push([0, y]); stack.push([width - 1, y]); }
         
         const isLogo = img.src.toLowerCase().includes('logo');
-        const tolerance = isLogo ? 85 : 35; // Tolerância maior para a logo para tirar todo o branco
+        const tolerance = isLogo ? 100 : 35; // Aumentado para a logo para garantir a remoção do branco
+        console.log(`[RDA] Processando imagem: ${img.src} (Tolerância: ${tolerance})`);
+        
         
         // Cor de referência (branco puro)
         const refR = 255, refG = 255, refB = 255;
@@ -594,232 +597,6 @@ function initBGRemoval() {
   });
 }
 
-// ===== PEDIDOS RECEBIDOS (ADMIN) =====
-function renderizarPedidosAdmin() {
-  const lista = document.getElementById('pedidos-lista');
-  if (!lista) return;
-
-  if (pedidos.length === 0) {
-    lista.innerHTML = '<p class="preco-hint">Ainda não há pedidos.</p>';
-    return;
-  }
-
-  lista.innerHTML = pedidos.map(p => `
-    <div class="pedido-item ${p.status === 'atendido' ? 'atendido' : ''}">
-      <div class="pedido-item-details">
-        <div class="pedido-status-area">
-          <span class="pedido-status-badge ${p.status}">${p.status.toUpperCase()}</span>
-          <span class="pedido-pagamento-badge ${p.pagamento}">${p.pagamento === 'pago' ? 'PAGO' : 'PAG. PENDENTE'}</span>
-          <span class="pedido-item-data">${p.data}</span>
-        </div>
-      </div>
-      <div class="pedido-item-detalhes">
-        <p>📍 <strong>End:</strong> ${p.endereco}</p>
-        ${p.telefone ? `<p>📞 <strong>Tel:</strong> ${p.telefone}</p>` : ''}
-        <p>📦 <strong>Itens:</strong> ${p.qtd20 > 0 ? p.qtd20 + 'x 20L ' : ''}${p.qtd10 > 0 ? p.qtd10 + 'x 10L' : ''}</p>
-        <p>💰 <strong>Total:</strong> ${p.total}</p>
-      </div>
-      <div class="pedido-item-actions">
-        <div class="pedido-actions-group">
-          <button class="btn ${p.status === 'atendido' ? 'btn-outline' : 'btn-primary'} btn-sm" 
-                  onclick="toggleStatusPedido(${p.id})">
-            ${p.status === 'atendido' ? 'Pendente' : 'Atender'}
-          </button>
-          <button class="btn ${p.pagamento === 'pago' ? 'btn-outline' : 'btn-success'} btn-sm" 
-                  onclick="togglePagamentoPedido(${p.id})">
-            ${p.pagamento === 'pago' ? 'Marcar Pendente' : 'Marcar Pago'}
-          </button>
-        </div>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="excluirPedido(${p.id})" title="Excluir Pedido">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-      ${p.telefone ? `
-        <div class="pedido-item-footer" style="margin-top: 10px;">
-          <button class="btn btn-success btn-sm btn-full" onclick="abrirWhatsCliente('${p.telefone}')">
-            <i class="fa-brands fa-whatsapp"></i> Falar com Cliente
-          </button>
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-  
-  renderizarRelatoriosAdmin();
-}
-
-function togglePagamentoPedido(id) {
-  const pedido = pedidos.find(p => p.id === id);
-  if (pedido) {
-    pedido.pagamento = pedido.pagamento === 'pago' ? 'pendente' : 'pago';
-    salvarDados();
-    renderizarPedidosAdmin();
-    mostrarToast(`Pagamento de ${pedido.nome} atualizado!`);
-  }
-}
-
-function toggleStatusPedido(id) {
-  const pedido = pedidos.find(p => p.id === id);
-  if (pedido) {
-    pedido.status = pedido.status === 'atendido' ? 'pendente' : 'atendido';
-    salvarDados();
-    renderizarPedidosAdmin();
-    mostrarToast(`Pedido de ${pedido.nome} atualizado!`);
-  }
-}
-
-function excluirPedido(id) {
-  if (confirm('Deseja realmente excluir este pedido do histórico?')) {
-    const idStr = String(id);
-    pedidos = pedidos.filter(p => String(p.id) !== idStr);
-    salvarDados();
-    renderizarPedidosAdmin();
-    mostrarToast('Pedido removido com sucesso.');
-  }
-}
-
-// ===== RELATÓRIOS (ADMIN) =====
-function renderizarRelatoriosAdmin() {
-  const container = document.getElementById('relatorios-lista');
-  if (!container) return;
-
-  if (pedidos.length === 0) {
-    container.innerHTML = '<p class="preco-hint">Ainda não há pedidos.</p>';
-    return;
-  }
-
-  // Agrupar por cliente
-  const clientesMap = {};
-  pedidos.forEach(p => {
-    const nome = p.nome.trim();
-    if (!clientesMap[nome]) {
-      clientesMap[nome] = { nome, totalPedidos: 0, temPendencia: false, ultimoPedido: p.data };
-    }
-    clientesMap[nome].totalPedidos++;
-    if (p.pagamento === 'pendente') {
-      clientesMap[nome].temPendencia = true;
-    }
-  });
-
-  const clientesRanking = Object.values(clientesMap).sort((a, b) => b.totalPedidos - a.totalPedidos);
-
-  container.innerHTML = `
-    <table class="relatorio-table">
-      <thead>
-        <tr>
-          <th>Cliente</th>
-          <th>Qtd</th>
-          <th>Último Pedido</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${clientesRanking.map(c => `
-          <tr>
-            <td class="td-nome" onclick='verDetalhesCliente(${JSON.stringify(c.nome)})'>${c.nome}</td>
-            <td>${c.totalPedidos}</td>
-            <td class="td-data">${c.ultimoPedido}</td>
-            <td>
-              <span class="badge-financeiro ${c.temPendencia ? 'debito' : 'ok'}">
-                ${c.temPendencia ? 'DÉBITO' : 'EM DIA'}
-              </span>
-            </td>
-            <td class="td-acoes-bulk">
-              <button class="btn btn-success btn-xs" onclick='marcarTudoPagoCliente(${JSON.stringify(c.nome)})' title="Marcar Tudo Pago">
-                <i class="fa-solid fa-check"></i>
-              </button>
-              <button class="btn btn-warning btn-xs" onclick='marcarTudoPendenteCliente(${JSON.stringify(c.nome)})' title="Marcar Tudo Pendente">
-                <i class="fa-solid fa-clock"></i>
-              </button>
-              <button class="btn btn-danger btn-xs" onclick='excluirTudoCliente(${JSON.stringify(c.nome)})' title="Excluir Tudo">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-  `;
-}
-
-function marcarTudoPagoCliente(nome) {
-  pedidos.forEach(p => {
-    if (p.nome.trim() === nome) p.pagamento = 'pago';
-  });
-  salvarDados();
-  renderizarPedidosAdmin();
-  mostrarToast(`Todos os pedidos de ${nome} marcados como pagos.`);
-}
-
-function marcarTudoPendenteCliente(nome) {
-  pedidos.forEach(p => {
-    if (p.nome.trim() === nome) p.pagamento = 'pendente';
-  });
-  salvarDados();
-  renderizarPedidosAdmin();
-  mostrarToast(`Todos os pedidos de ${nome} marcados como pendentes.`);
-}
-
-function excluirTudoCliente(nome) {
-  if (confirm(`Deseja excluir TODOS os pedidos de "${nome}"? Esta ação não pode ser desfeita.`)) {
-    const nomeLimpo = String(nome).trim().toLowerCase();
-    pedidos = pedidos.filter(p => String(p.nome).trim().toLowerCase() !== nomeLimpo);
-    salvarDados();
-    renderizarPedidosAdmin();
-    mostrarToast(`Todo o histórico de "${nome}" foi removido.`);
-  }
-}
-
-function initPedidosAdmin() {
-  renderizarPedidosAdmin();
-
-  document.getElementById('btn-limpar-pedidos').addEventListener('click', () => {
-    if (confirm('Deseja realmente limpar todo o histórico de pedidos?')) {
-      pedidos = [];
-      salvarDados();
-      renderizarPedidosAdmin();
-      mostrarToast('Histórico de pedidos limpo.');
-    }
-  });
-}
-
-// ===== CONFIGURAÇÕES (ADMIN) =====
-function initSettingsAdmin() {
-  const inputWhatsapp = document.getElementById('input-whatsapp');
-  const inputInsta    = document.getElementById('input-insta');
-  const inputSenhaNova = document.getElementById('input-senha-nova');
-  const btnSalvar = document.getElementById('btn-salvar-settings');
-
-  if (!btnSalvar) return;
-
-  // Preencher valores atuais
-  inputWhatsapp.value = customConfig.whatsapp;
-  inputInsta.value    = customConfig.instagram;
-  inputSenhaNova.value = customConfig.adminSenha;
-
-  btnSalvar.addEventListener('click', () => {
-    const whats = inputWhatsapp.value.trim();
-    const insta = inputInsta.value.trim();
-    const senha = inputSenhaNova.value.trim();
-
-    if (!whats) {
-      mostrarToast('O WhatsApp não pode ficar vazio.', 'error');
-      return;
-    }
-    if (senha.length < 4) {
-      mostrarToast('A senha deve ter pelo menos 4 caracteres.', 'error');
-      return;
-    }
-
-    customConfig.whatsapp = whats;
-    customConfig.instagram = insta;
-    customConfig.adminSenha = senha;
-
-    salvarDados();
-    aplicarConfiguracoes();
-    mostrarToast('Configurações salvas com sucesso!');
-  });
-}
 
 // ===== FROTA (CAMINHÕES) =====
 function renderizarFrota() {
@@ -880,165 +657,7 @@ function initFrota() {
   });
 }
 
-// ===== INICIALIZAÇÃO =====
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Carregar dados do localStorage
-  carregarDados();
-  
-  // 2. Verificar se está logado (agora usando localStorage para persistência total)
-  if (localStorage.getItem(ADMIN_CONFIG.sessionKey) === 'true') {
-    document.body.classList.add('admin-logged-in');
-  }
 
-  // 3. Inicializar componentes (já cientes do estado admin)
-  initNavbar();
-  initPrecos();
-  initRotas();
-  initPedido();
-  initFooter();
-  initScrollSuave();
-  initBGRemoval();
-  initFrota();
-  initPedidosAdmin();
-  initSettingsAdmin();
-  initAdmin(); // Configura eventos do modal
-
-  // Pequeno delay para animações não conflitarem com o carregamento
-  setTimeout(initAnimacoes, 100);
-});
-
-/* =============================================
-   ADMINISTRATIVO (ÁREA DO PROPRIETÁRIO)
-   ============================================= */
-
-const ADMIN_CONFIG = {
-  senhaCorreta: 'reidaagua@',
-  sessionKey: 'rda_admin_logged_in'
-};
-
-function initAdmin() {
-  const loginBtn      = document.getElementById('admin-login-btn');
-  const modal         = document.getElementById('modal-senha');
-  const inputSenha    = document.getElementById('input-senha');
-  const btnCancelar   = document.getElementById('btn-cancelar-senha');
-  const btnConfirmar  = document.getElementById('btn-confirmar-senha');
-
-  // Verificar estado para o ícone
-  if (document.body.classList.contains('admin-logged-in')) {
-    loginBtn.title = 'Sair da Área Administrativa';
-  }
-
-  // Abrir modal ou deslogar
-  loginBtn.addEventListener('click', () => {
-    if (document.body.classList.contains('admin-logged-in')) {
-      if (confirm('Deseja sair da área administrativa?')) {
-        document.body.classList.remove('admin-logged-in');
-        localStorage.removeItem(ADMIN_CONFIG.sessionKey);
-        loginBtn.title = 'Área do Proprietário';
-        mostrarToast('Você saiu da área administrativa.');
-        window.location.href = window.location.pathname; // Vai para o topo e limpa a hash
-      }
-    } else {
-      modal.classList.add('show');
-      inputSenha.value = '';
-      inputSenha.focus();
-    }
-  });
-
-  // Fechar modal
-  btnCancelar.addEventListener('click', () => {
-    modal.classList.remove('show');
-  });
-
-  // Confirmar senha
-  function validarSenha() {
-    if (inputSenha.value === customConfig.adminSenha) {
-      document.body.classList.add('admin-logged-in');
-      localStorage.setItem(ADMIN_CONFIG.sessionKey, 'true');
-      modal.classList.remove('show');
-      loginBtn.title = 'Sair da Área Administrativa';
-      mostrarToast('Acesso administrativo liberado!');
-      
-      // Ir para o topo e recarregar para aplicar mudanças visuais
-      window.location.href = window.location.pathname;
-    } else {
-      mostrarToast('Senha incorreta!', 'error');
-      inputSenha.value = '';
-      inputSenha.focus();
-    }
-  }
-
-  btnConfirmar.addEventListener('click', validarSenha);
-  inputSenha.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') validarSenha();
-  });
-
-  // Fechar modal ao clicar fora
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('show');
-  });
-
-  // Modal Detalhes do Cliente
-  const modalDetalhes = document.getElementById('modal-detalhes-cliente');
-  const btnFecharDetalhes = document.getElementById('btn-fechar-detalhes');
-  if (btnFecharDetalhes) {
-    btnFecharDetalhes.addEventListener('click', () => {
-      modalDetalhes.classList.remove('show');
-    });
-  }
-  if (modalDetalhes) {
-    modalDetalhes.addEventListener('click', (e) => {
-      if (e.target === modalDetalhes) modalDetalhes.classList.remove('show');
-    });
-  }
-}
-
-function verDetalhesCliente(nome) {
-  const modal = document.getElementById('modal-detalhes-cliente');
-  const corpo = document.getElementById('detalhes-cliente-corpo');
-  const titulo = document.getElementById('detalhes-cliente-titulo');
-  
-  if (!modal || !corpo) return;
-
-  titulo.textContent = `Pedidos de ${nome}`;
-  const pedidosCliente = pedidos.filter(p => p.nome.trim() === nome.trim());
-
-  corpo.innerHTML = pedidosCliente.map(p => `
-    <div class="detalhes-pedido-box">
-      <h4>
-        <span>📅 ${p.data}</span>
-        <div class="modal-badge-group">
-          <span class="pedido-status-badge ${p.status}">${p.status.toUpperCase()}</span>
-          <span class="pedido-pagamento-badge ${p.pagamento}">${p.pagamento === 'pago' ? 'PAGO' : 'PENDENTE'}</span>
-        </div>
-      </h4>
-      <p>📦 <strong>Itens:</strong> ${p.qtd20 > 0 ? p.qtd20 + 'x 20L ' : ''}${p.qtd10 > 0 ? p.qtd10 + 'x 10L' : ''}</p>
-      <p>💰 <strong>Total:</strong> ${p.total}</p>
-      <p>📍 <strong>Endereço:</strong> ${p.endereco}</p>
-      ${p.telefone ? `<p>📞 <strong>Telefone:</strong> ${p.telefone}</p>` : ''}
-      
-      <div class="pedido-item-actions" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-        <button class="btn ${p.status === 'atendido' ? 'btn-outline' : 'btn-primary'} btn-sm" 
-                onclick="toggleStatusPedido(${p.id}); verDetalhesCliente('${nome}')">
-          ${p.status === 'atendido' ? 'Pendente' : 'Atender'}
-        </button>
-        <button class="btn ${p.pagamento === 'pago' ? 'btn-outline' : 'btn-success'} btn-sm" 
-                onclick="togglePagamentoPedido(${p.id}); verDetalhesCliente('${nome}')">
-          ${p.pagamento === 'pago' ? 'Marcar Pendente' : 'Marcar Pago'}
-        </button>
-      </div>
-      ${p.telefone ? `
-        <div style="margin-top: 10px;">
-          <button class="btn btn-whatsapp btn-sm btn-full" onclick="abrirWhatsCliente('${p.telefone}')">
-             <i class="fa-brands fa-whatsapp"></i> Falar com Cliente
-          </button>
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-
-  modal.classList.add('show');
-}
 
 function abrirWhatsCliente(tel) {
   if (!tel) return;
@@ -1052,23 +671,29 @@ function abrirWhatsCliente(tel) {
 
 // ===== INICIALIZAÇÃO =====
 async function bootstrap() {
-  // Primeiro carrega os dados (Supabase ou Local)
-  await carregarDados();
-  
-  // Depois inicializa as partes da UI
-  initNavbar();
-  initCalculadora();
-  initPrecos();
-  initRotas();
-  initFrota();
-  initPedidos();
-  initAdmin();
-
-  // Expor funções necessárias para o HTML (onclick, etc)
-  window.verDetalhesCliente = verDetalhesCliente;
-  window.abrirWhatsCliente = abrirWhatsCliente;
-  window.toggleStatusPedido = typeof toggleStatusPedido !== 'undefined' ? toggleStatusPedido : null;
-  window.togglePagamentoPedido = typeof togglePagamentoPedido !== 'undefined' ? togglePagamentoPedido : null;
+  console.log('[RDA] Bootstrap iniciado...');
+  try {
+    // Primeiro carrega os dados (Supabase ou Local)
+    console.log('[RDA] Carregando dados...');
+    await carregarDados();
+    
+    // Depois inicializa as partes da UI
+    console.log('[RDA] Inicializando componentes...');
+    initNavbar();
+    initPrecos();
+    initRotas();
+    initFrota();
+    initPedido();
+    
+    // Expor funções necessárias para o HTML (onclick, etc)
+    window.abrirWhatsCliente = abrirWhatsCliente;
+    
+    // Pequeno delay para animações
+    setTimeout(initAnimacoes, 100);
+    console.log('[RDA] Bootstrap concluído com sucesso!');
+  } catch (err) {
+    console.error('[RDA] Erro fatal no bootstrap:', err);
+  }
 }
 
 // Inicia tudo

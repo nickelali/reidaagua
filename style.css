@@ -107,7 +107,6 @@ img {
 }
 
 .remove-bg {
-  opacity: 0;
   transition: transform var(--transicao), opacity 0.5s ease;
 }
 

@@ -68,6 +68,14 @@ export async function updateSetting(key, value) {
   return true;
 }
 
+/** Atualiza múltiplas configurações de uma vez */
+export async function updateSettings(settingsObj) {
+  const promises = Object.entries(settingsObj).map(([key, value]) => 
+    updateSetting(key, value)
+  );
+  return Promise.all(promises);
+}
+
 // ===== PRODUTOS =====
 
 /** Retorna produtos ativos */

@@ -21,13 +21,15 @@ export async function logout() {
 
 // ===== SESSÃO ATUAL =====
 export async function getCurrentUser() {
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  // getSession() lê do localStorage de forma síncrona (mais rápido)
+  // getUser() faz uma requisição de rede para validar o token
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.user ?? null;
 }
 
-// ===== PERFIL DO USUÁRIO (com role) =====
 export async function getUserProfile(userId = null) {
   const uid = userId || (await getCurrentUser())?.id;
+  console.log('[auth] Buscando perfil para UID:', uid);
   if (!uid) return null;
 
   const { data, error } = await supabase
@@ -40,6 +42,7 @@ export async function getUserProfile(userId = null) {
     console.warn('[auth] Erro ao buscar perfil:', error.message);
     return null;
   }
+  console.log('[auth] Perfil encontrado:', data);
   return data;
 }
 
@@ -47,13 +50,18 @@ export async function getUserProfile(userId = null) {
 // allowedRoles: ['admin'] | ['driver'] | ['admin', 'driver']
 // Redireciona se não autenticado ou role não permitida.
 export async function requireAuth(allowedRoles = ['admin', 'driver']) {
-  const user = await getCurrentUser();
+  console.log('[auth] requireAuth iniciado...');
+  // Aguarda o Supabase restaurar a sessão do localStorage
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log('[auth] Sessão recuperada:', session ? 'Sim' : 'Não');
 
-  if (!user) {
+  if (!session) {
+    console.log('[auth] Sem sessão, redirecionando para login...');
     window.location.href = '/login.html';
     return null;
   }
 
+  const user = session.user;
   const profile = await getUserProfile(user.id);
 
   if (!profile) {
@@ -61,6 +69,7 @@ export async function requireAuth(allowedRoles = ['admin', 'driver']) {
     await logout();
     return null;
   }
+  console.log('[auth] Role do usuário:', profile.role);
 
   if (!allowedRoles.includes(profile.role)) {
     // Redireciona para a página correta do role
